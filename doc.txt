@@ -1,0 +1,19 @@
+order-management-system/
+├── cmd/
+│   └── main.go
+├── config/
+│   └── config.go
+├── controllers/
+│   └── user_controller.go
+├── models/
+│   └── user.go
+├── repositories/
+│   └── user_repository.go
+├── services/
+│   └── user_service.go
+├── routes/
+│   └── routes.go
+├── utils/
+│   └── utils.go
+├── go.mod
+└── go.sum

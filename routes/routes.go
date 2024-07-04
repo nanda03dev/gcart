@@ -15,6 +15,10 @@ func SetupRouter() *gin.Engine {
 	userService := services.NewUserService(userRepository)
 	userController := controllers.NewUserController(userService)
 
+	orderRepository := repositories.NewOrderRepository(config.DB)
+	orderService := services.NewOrderService(orderRepository)
+	orderController := controllers.NewOrderController(orderService)
+
 	userRoutes := router.Group("/users")
 	{
 		userRoutes.POST("/", userController.CreateUser)
@@ -22,6 +26,15 @@ func SetupRouter() *gin.Engine {
 		userRoutes.GET("/:id", userController.GetUserByID)
 		userRoutes.PUT("/:id", userController.UpdateUser)
 		userRoutes.DELETE("/:id", userController.DeleteUser)
+	}
+
+	orderRoutes := router.Group("/orders")
+	{
+		orderRoutes.POST("/", orderController.CreateOrder)
+		orderRoutes.GET("/", orderController.GetAllOrders)
+		orderRoutes.GET("/:id", orderController.GetOrderByID)
+		orderRoutes.PUT("/:id", orderController.UpdateOrder)
+		orderRoutes.DELETE("/:id", orderController.DeleteOrder)
 	}
 
 	return router

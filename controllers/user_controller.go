@@ -42,12 +42,8 @@ func (c *UserController) GetAllUsers(ctx *gin.Context) {
 
 func (c *UserController) GetUserByID(ctx *gin.Context) {
 	idParam := ctx.Param("id")
-	id, err := primitive.ObjectIDFromHex(idParam)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
-		return
-	}
-	user, err := c.userService.GetUserByID(id)
+
+	user, err := c.userService.GetUserByID(idParam)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -72,12 +68,7 @@ func (c *UserController) UpdateUser(ctx *gin.Context) {
 
 func (c *UserController) DeleteUser(ctx *gin.Context) {
 	idParam := ctx.Param("id")
-	id, err := primitive.ObjectIDFromHex(idParam)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
-		return
-	}
-	if err := c.userService.DeleteUser(id); err != nil {
+	if err := c.userService.DeleteUser(idParam); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

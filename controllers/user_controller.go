@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/nanda03dev/oms/models"
-	"github.com/nanda03dev/oms/services"
+	"github.com/nanda03dev/go2ms/models"
+	"github.com/nanda03dev/go2ms/services"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 

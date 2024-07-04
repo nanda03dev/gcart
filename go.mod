@@ -1,4 +1,4 @@
-module github.com/nanda03dev/oms
+module github.com/nanda03dev/go2ms
 
 go 1.21.5
 

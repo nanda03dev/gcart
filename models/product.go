@@ -2,9 +2,9 @@ package models
 
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
-type Order struct {
+type Product struct {
 	ID     primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+	Name   string             `json:"name" bson:"name"`
 	Amount int                `json:"amount" bson:"amount"`
-	UserID primitive.ObjectID `json:"userId" bson:"userID"`
 	Status bool               `bson:"status"`
 }

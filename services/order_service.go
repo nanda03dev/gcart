@@ -9,7 +9,7 @@ import (
 )
 
 type OrderService interface {
-	CreateOrder(order models.Order) error
+	CreateOrder(order models.Order) (models.Order, error)
 	GetAllOrders() ([]models.Order, error)
 	GetOrderByID(id string) (models.Order, error)
 	UpdateOrder(order models.Order) error
@@ -24,8 +24,9 @@ func NewOrderService(orderRepository *repositories.OrderRepository) OrderService
 	return &orderService{orderRepository}
 }
 
-func (s *orderService) CreateOrder(order models.Order) error {
-	return s.orderRepository.Create(context.Background(), order)
+func (s *orderService) CreateOrder(order models.Order) (models.Order, error) {
+	order.ID = primitive.NewObjectID()
+	return order, s.orderRepository.Create(context.Background(), order)
 }
 
 func (s *orderService) GetAllOrders() ([]models.Order, error) {

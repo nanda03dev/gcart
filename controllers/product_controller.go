@@ -23,11 +23,13 @@ func (c *ProductController) CreateProduct(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	product.ID = primitive.NewObjectID()
-	if err := c.productService.CreateProduct(product); err != nil {
+	product, err := c.productService.CreateProduct(product)
+
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
 	ctx.JSON(http.StatusCreated, product)
 }
 

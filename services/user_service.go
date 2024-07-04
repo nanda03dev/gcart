@@ -9,7 +9,7 @@ import (
 )
 
 type UserService interface {
-	CreateUser(user models.User) error
+	CreateUser(user models.User) (models.User, error)
 	GetAllUsers() ([]models.User, error)
 	GetUserByID(id string) (models.User, error)
 	UpdateUser(user models.User) error
@@ -24,8 +24,10 @@ func NewUserService(userRepository *repositories.UserRepository) UserService {
 	return &userService{userRepository}
 }
 
-func (s *userService) CreateUser(user models.User) error {
-	return s.userRepository.Create(context.Background(), user)
+func (s *userService) CreateUser(user models.User) (models.User, error) {
+	user.ID = primitive.NewObjectID()
+
+	return user, s.userRepository.Create(context.Background(), user)
 }
 
 func (s *userService) GetAllUsers() ([]models.User, error) {

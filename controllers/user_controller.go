@@ -23,11 +23,13 @@ func (c *UserController) CreateUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	user.ID = primitive.NewObjectID()
-	if err := c.userService.CreateUser(user); err != nil {
+	user, err := c.userService.CreateUser(user)
+
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
 	ctx.JSON(http.StatusCreated, user)
 }
 

@@ -23,8 +23,9 @@ func (c *ItemController) CreateItem(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	item.ID = primitive.NewObjectID()
-	if err := c.itemService.CreateItem(item); err != nil {
+	item, err := c.itemService.CreateItem(item)
+
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

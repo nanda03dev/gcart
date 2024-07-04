@@ -23,8 +23,9 @@ func (c *CityController) CreateCity(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	city.ID = primitive.NewObjectID()
-	if err := c.cityService.CreateCity(city); err != nil {
+	city, err := c.cityService.CreateCity(city)
+
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

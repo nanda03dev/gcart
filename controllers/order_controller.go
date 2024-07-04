@@ -23,11 +23,13 @@ func (c *OrderController) CreateOrder(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	order.ID = primitive.NewObjectID()
-	if err := c.orderService.CreateOrder(order); err != nil {
+	order, err := c.orderService.CreateOrder(order)
+
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
 	ctx.JSON(http.StatusCreated, order)
 }
 

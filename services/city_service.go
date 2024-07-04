@@ -9,7 +9,7 @@ import (
 )
 
 type CityService interface {
-	CreateCity(city models.City) error
+	CreateCity(city models.City) (models.City, error)
 	GetAllCities() ([]models.City, error)
 	GetCityByID(id string) (models.City, error)
 	UpdateCity(city models.City) error
@@ -24,8 +24,9 @@ func NewCityService(cityRepository *repositories.CityRepository) CityService {
 	return &cityService{cityRepository}
 }
 
-func (s *cityService) CreateCity(city models.City) error {
-	return s.cityRepository.Create(context.Background(), city)
+func (s *cityService) CreateCity(city models.City) (models.City, error) {
+	city.ID = primitive.NewObjectID()
+	return city, s.cityRepository.Create(context.Background(), city)
 }
 
 func (s *cityService) GetAllCities() ([]models.City, error) {

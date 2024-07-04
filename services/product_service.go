@@ -9,7 +9,7 @@ import (
 )
 
 type ProductService interface {
-	CreateProduct(product models.Product) error
+	CreateProduct(product models.Product) (models.Product, error)
 	GetAllProducts() ([]models.Product, error)
 	GetProductByID(id string) (models.Product, error)
 	UpdateProduct(product models.Product) error
@@ -24,8 +24,10 @@ func NewProductService(productRepository *repositories.ProductRepository) Produc
 	return &productService{productRepository}
 }
 
-func (s *productService) CreateProduct(product models.Product) error {
-	return s.productRepository.Create(context.Background(), product)
+func (s *productService) CreateProduct(product models.Product) (models.Product, error) {
+	product.ID = primitive.NewObjectID()
+
+	return product, s.productRepository.Create(context.Background(), product)
 }
 
 func (s *productService) GetAllProducts() ([]models.Product, error) {

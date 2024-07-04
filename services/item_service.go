@@ -9,7 +9,7 @@ import (
 )
 
 type ItemService interface {
-	CreateItem(item models.Item) error
+	CreateItem(item models.Item) (models.Item, error)
 	GetAllCities() ([]models.Item, error)
 	GetItemByID(id string) (models.Item, error)
 	UpdateItem(item models.Item) error
@@ -24,8 +24,9 @@ func NewItemService(itemRepository *repositories.ItemRepository) ItemService {
 	return &itemService{itemRepository}
 }
 
-func (s *itemService) CreateItem(item models.Item) error {
-	return s.itemRepository.Create(context.Background(), item)
+func (s *itemService) CreateItem(item models.Item) (models.Item, error) {
+	item.ID = primitive.NewObjectID()
+	return item, s.itemRepository.Create(context.Background(), item)
 }
 
 func (s *itemService) GetAllCities() ([]models.Item, error) {

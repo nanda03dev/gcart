@@ -1,8 +1,8 @@
 package repositories
 
 import (
+	"github.com/nanda03dev/go2ms/models"
 	"go.mongodb.org/mongo-driver/mongo"
-	"github.com/nanda03dev/oms/models"
 )
 
 type UserRepository struct {

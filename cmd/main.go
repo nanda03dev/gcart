@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/nanda03dev/oms/config"
-	"github.com/nanda03dev/oms/routes"
+	"github.com/nanda03dev/go2ms/config"
+	"github.com/nanda03dev/go2ms/routes"
 )
 
 func main() {

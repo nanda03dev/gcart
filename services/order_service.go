@@ -2,8 +2,9 @@ package services
 
 import (
 	"context"
-	"github.com/nanda03dev/oms/models"
-	"github.com/nanda03dev/oms/repositories"
+
+	"github.com/nanda03dev/go2ms/models"
+	"github.com/nanda03dev/go2ms/repositories"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 

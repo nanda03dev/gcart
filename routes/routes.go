@@ -2,34 +2,18 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/nanda03dev/go2ms/config"
 	"github.com/nanda03dev/go2ms/controllers"
-	"github.com/nanda03dev/go2ms/repositories"
 	"github.com/nanda03dev/go2ms/services"
 )
 
-func SetupRouter() *gin.Engine {
+func InitializeRouter() *gin.Engine {
 	router := gin.Default()
 
-	userRepository := repositories.NewUserRepository(config.DB)
-	userService := services.NewUserService(userRepository)
-	userController := controllers.NewUserController(userService)
-
-	orderRepository := repositories.NewOrderRepository(config.DB)
-	orderService := services.NewOrderService(orderRepository)
-	orderController := controllers.NewOrderController(orderService)
-
-	cityRepository := repositories.NewCityRepository(config.DB)
-	cityService := services.NewCityService(cityRepository)
-	cityController := controllers.NewCityController(cityService)
-
-	productRepository := repositories.NewProductRepository(config.DB)
-	productService := services.NewProductService(productRepository)
-	productController := controllers.NewProductController(productService)
-
-	itemRepository := repositories.NewItemRepository(config.DB)
-	itemService := services.NewItemService(itemRepository)
-	itemController := controllers.NewItemController(itemService)
+	userController := controllers.NewUserController(services.AppServices.User)
+	orderController := controllers.NewOrderController(services.AppServices.Order)
+	cityController := controllers.NewCityController(services.AppServices.City)
+	productController := controllers.NewProductController(services.AppServices.Product)
+	itemController := controllers.NewItemController(services.AppServices.Item)
 
 	userRoutes := router.Group("/users")
 	{

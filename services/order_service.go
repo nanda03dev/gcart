@@ -5,6 +5,7 @@ import (
 
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
+	"github.com/nanda03dev/go2ms/workers"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -26,7 +27,10 @@ func NewOrderService(orderRepository *repositories.OrderRepository) OrderService
 
 func (s *orderService) CreateOrder(order models.Order) (models.Order, error) {
 	order.ID = primitive.NewObjectID()
-	return order, s.orderRepository.Create(context.Background(), order)
+	err := s.orderRepository.Create(context.Background(), order)
+	workers.AddToOrderWorkerChan(order.ID)
+
+	return order, err
 }
 
 func (s *orderService) GetAllOrders() ([]models.Order, error) {

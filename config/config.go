@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -20,7 +21,17 @@ func LoadConfig() {
 	if err != nil {
 		log.Println("No .env file found")
 	}
+	if os.Getenv("PORT") != "" {
+		os.Setenv("PORT", "8080")
+	}
+	if os.Getenv("GIN_MODE") != "" {
+		os.Setenv("GIN_MODE", gin.ReleaseMode)
+	}
+	gin.SetMode(os.Getenv("GIN_MODE"))
 
+}
+
+func SetupDatabase() *mongo.Database {
 	mongoURI := "mongodb://localhost:27017"
 
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
@@ -44,9 +55,6 @@ func LoadConfig() {
 
 	fmt.Println("Pinged your deployment. You successfully connected to MongoDB!")
 
-	if os.Getenv("PORT") != "" {
-		os.Setenv("PORT", "8080")
-	}
-
 	DB = client.Database("go2ms")
+	return DB
 }

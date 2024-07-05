@@ -4,19 +4,30 @@ import (
 	"log"
 	"os"
 
-	"github.com/gin-gonic/gin"
 	"github.com/nanda03dev/go2ms/config"
+	"github.com/nanda03dev/go2ms/repositories"
 	"github.com/nanda03dev/go2ms/routes"
+	"github.com/nanda03dev/go2ms/services"
+	"github.com/nanda03dev/go2ms/workers"
 )
 
 func main() {
 	config.LoadConfig()
-	gin.SetMode(gin.ReleaseMode)
 
-	router := routes.SetupRouter()
+	database := config.SetupDatabase()
 
+	repositories.InitializeRepositories(database)
+
+	services.InitializeServices(database)
+
+	go workers.InitiateWorker()
+
+	InitiateServer()
+}
+
+func InitiateServer() {
 	PORT := os.Getenv("PORT")
 	log.Println("Server running at http://localhost:" + PORT)
-	log.Fatal(router.Run(":" + PORT))
-
+	router := routes.InitializeRouter()
+	router.Run(":" + PORT)
 }

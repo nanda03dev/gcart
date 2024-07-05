@@ -20,7 +20,7 @@ func Start3201Worker() {
 		v := <-channel
 		event := models.Event{
 			ID:         primitive.NewObjectID(),
-			OrderId:    v.String(),
+			OrderId:    v,
 			ExpireTime: time.Now().Add(1 * time.Minute),
 		}
 		repositories.AppRepositories.Event.Create(context.TODO(), event)

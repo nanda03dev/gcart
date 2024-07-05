@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"context"
-	"fmt"
+	"strings"
 
 	"github.com/nanda03dev/go2ms/common"
 	"go.mongodb.org/mongo-driver/bson"
@@ -26,14 +26,18 @@ func (r *BaseRepository[T]) Create(ctx context.Context, document T) error {
 	return err
 }
 
-func (r *BaseRepository[T]) GetAll(ctx context.Context, filters common.Filters, sort interface{}, limit interface{}) ([]T, error) {
+func convertKeyLower(key string) string {
+	return strings.ToLower(string(key[0])) + key[1:]
+}
+
+func (r *BaseRepository[T]) GetAll(ctx context.Context, filters common.FiltersBody, sort interface{}, limit interface{}) ([]T, error) {
 	filter := bson.D{}
 	if filters == nil {
 		filter = bson.D{}
 	}
 
 	for _, f := range filters {
-		filter = append(filter, bson.E{Key: f.Key, Value: f.Value})
+		filter = append(filter, bson.E{Key: convertKeyLower(f.Key), Value: f.Value})
 	}
 
 	// Prepare options
@@ -41,16 +45,14 @@ func (r *BaseRepository[T]) GetAll(ctx context.Context, filters common.Filters, 
 	sortOptions := bson.D{{Key: "_id", Value: 1}}
 
 	if sort != nil {
-		fmt.Println("sort ", sort)
 
-		temp := sort.(common.Sort)
+		temp := sort.(common.SortBody)
 		if temp.Order < 1 {
 			temp.Order = -1
 		}
-		sortOptions = bson.D{{Key: temp.Key, Value: temp.Order}}
+		sortOptions = bson.D{{Key: convertKeyLower(temp.Key), Value: temp.Order}}
 	}
 
-	fmt.Println("sortOptions ", sortOptions)
 	findOptions.SetSort(sortOptions)
 
 	if limit != nil {

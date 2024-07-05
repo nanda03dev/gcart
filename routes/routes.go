@@ -14,6 +14,7 @@ func InitializeRouter() *gin.Engine {
 	cityController := controllers.NewCityController(services.AppServices.City)
 	productController := controllers.NewProductController(services.AppServices.Product)
 	itemController := controllers.NewItemController(services.AppServices.Item)
+	eventController := controllers.NewEventController(services.AppServices.Event)
 
 	userRoutes := router.Group("/users")
 	{
@@ -58,6 +59,15 @@ func InitializeRouter() *gin.Engine {
 		itemRoutes.GET("/:id", itemController.GetItemByID)
 		itemRoutes.PUT("/:id", itemController.UpdateItem)
 		itemRoutes.DELETE("/:id", itemController.DeleteItem)
+	}
+
+	eventRoutes := router.Group("/events")
+	{
+		eventRoutes.POST("/", eventController.CreateEvent)
+		eventRoutes.POST("/filter", eventController.GetAllEvents)
+		eventRoutes.GET("/:id", eventController.GetEventByID)
+		eventRoutes.PUT("/:id", eventController.UpdateEvent)
+		eventRoutes.DELETE("/:id", eventController.DeleteEvent)
 	}
 
 	return router

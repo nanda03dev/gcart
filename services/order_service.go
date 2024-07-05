@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/nanda03dev/go2ms/common"
+	"github.com/nanda03dev/go2ms/global_constant"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
 	"github.com/nanda03dev/go2ms/workers"
@@ -28,6 +29,7 @@ func NewOrderService(orderRepository *repositories.OrderRepository) OrderService
 
 func (s *orderService) CreateOrder(order models.Order) (models.Order, error) {
 	order.ID = primitive.NewObjectID()
+	order.Code = global_constant.ORDER_SUCCESS_STATUS_CODE.ORDER_INITIATED
 	err := s.orderRepository.Create(context.Background(), order)
 	workers.AddTo3201Chan(order.ID)
 

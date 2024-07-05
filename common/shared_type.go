@@ -1,19 +1,19 @@
 package common
 
-type Filter struct {
+type FilterBody struct {
 	Key   string
 	Value interface{}
 }
 
-type Filters []Filter
+type FiltersBody []FilterBody
 
 type RequestFilterBody struct {
-	ListOfFilter Filters `json:"filters"`
-	Size         int     `json:"size"`
-	SortBody     Sort    `json:"sort"`
+	ListOfFilter FiltersBody `json:"filters"`
+	Size         int         `json:"size"`
+	SortBody     SortBody    `json:"sort"`
 }
 
-type Sort struct {
+type SortBody struct {
 	Key   string `json:"Key"`
 	Order int    `json:"order"`
 }

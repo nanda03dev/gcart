@@ -32,7 +32,7 @@ func LoadConfig() {
 	client, err := mongo.Connect(ctx, opts)
 
 	if err != nil {
-		println("Connect time out")
+		println("Connection timed out")
 		panic(err)
 	}
 

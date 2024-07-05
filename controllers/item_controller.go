@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/services"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -33,7 +34,13 @@ func (c *ItemController) CreateItem(ctx *gin.Context) {
 }
 
 func (c *ItemController) GetAllItems(ctx *gin.Context) {
-	items, err := c.itemService.GetAllCities()
+	var requestFilterBody common.RequestFilterBody
+	if err := ctx.ShouldBindJSON(&requestFilterBody); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	items, err := c.itemService.GetAllCities(requestFilterBody)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 
+	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -10,7 +11,7 @@ import (
 
 type PaymentService interface {
 	CreatePayment(payment models.Payment) (models.Payment, error)
-	GetAllPayments() ([]models.Payment, error)
+	GetAllPayments(requestFilterBody common.RequestFilterBody) ([]models.Payment, error)
 	GetPaymentByID(id string) (models.Payment, error)
 	UpdatePayment(payment models.Payment) error
 	DeletePayment(id string) error
@@ -30,8 +31,8 @@ func (s *paymentService) CreatePayment(payment models.Payment) (models.Payment, 
 	return payment, s.paymentRepository.Create(context.Background(), payment)
 }
 
-func (s *paymentService) GetAllPayments() ([]models.Payment, error) {
-	return s.paymentRepository.GetAll(context.Background(), nil)
+func (s *paymentService) GetAllPayments(requestFilterBody common.RequestFilterBody) ([]models.Payment, error) {
+	return s.paymentRepository.GetAll(context.Background(), requestFilterBody.ListOfFilter, requestFilterBody.SortBody, requestFilterBody.Size)
 }
 
 func (s *paymentService) GetPaymentByID(id string) (models.Payment, error) {

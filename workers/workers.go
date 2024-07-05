@@ -1,6 +1,6 @@
 package workers
 
 func InitiateWorker() {
-	go StartOrderWorker()
-	go StartPaymentCancelWorker()
+	go Start3201Worker()
+	go Start3408Worker()
 }

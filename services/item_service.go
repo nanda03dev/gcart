@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 
+	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -10,7 +11,7 @@ import (
 
 type ItemService interface {
 	CreateItem(item models.Item) (models.Item, error)
-	GetAllCities() ([]models.Item, error)
+	GetAllCities(requestFilterBody common.RequestFilterBody) ([]models.Item, error)
 	GetItemByID(id string) (models.Item, error)
 	UpdateItem(item models.Item) error
 	DeleteItem(id string) error
@@ -29,8 +30,8 @@ func (s *itemService) CreateItem(item models.Item) (models.Item, error) {
 	return item, s.itemRepository.Create(context.Background(), item)
 }
 
-func (s *itemService) GetAllCities() ([]models.Item, error) {
-	return s.itemRepository.GetAll(context.Background(), nil)
+func (s *itemService) GetAllCities(requestFilterBody common.RequestFilterBody) ([]models.Item, error) {
+	return s.itemRepository.GetAll(context.Background(), requestFilterBody.ListOfFilter, requestFilterBody.SortBody, requestFilterBody.Size)
 }
 
 func (s *itemService) GetItemByID(id string) (models.Item, error) {

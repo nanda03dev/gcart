@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 
+	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -10,7 +11,7 @@ import (
 
 type UserService interface {
 	CreateUser(user models.User) (models.User, error)
-	GetAllUsers() ([]models.User, error)
+	GetAllUsers(requestFilterBody common.RequestFilterBody) ([]models.User, error)
 	GetUserByID(id string) (models.User, error)
 	UpdateUser(user models.User) error
 	DeleteUser(id string) error
@@ -30,8 +31,8 @@ func (s *userService) CreateUser(user models.User) (models.User, error) {
 	return user, s.userRepository.Create(context.Background(), user)
 }
 
-func (s *userService) GetAllUsers() ([]models.User, error) {
-	return s.userRepository.GetAll(context.Background(), nil)
+func (s *userService) GetAllUsers(requestFilterBody common.RequestFilterBody) ([]models.User, error) {
+	return s.userRepository.GetAll(context.Background(), requestFilterBody.ListOfFilter, requestFilterBody.SortBody, requestFilterBody.Size)
 }
 
 func (s *userService) GetUserByID(id string) (models.User, error) {

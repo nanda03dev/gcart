@@ -18,7 +18,7 @@ func InitializeRouter() *gin.Engine {
 	userRoutes := router.Group("/users")
 	{
 		userRoutes.POST("/", userController.CreateUser)
-		userRoutes.GET("/", userController.GetAllUsers)
+		userRoutes.POST("/filter", userController.GetAllUsers)
 		userRoutes.GET("/:id", userController.GetUserByID)
 		userRoutes.PUT("/:id", userController.UpdateUser)
 		userRoutes.DELETE("/:id", userController.DeleteUser)
@@ -27,7 +27,7 @@ func InitializeRouter() *gin.Engine {
 	orderRoutes := router.Group("/orders")
 	{
 		orderRoutes.POST("/", orderController.CreateOrder)
-		orderRoutes.GET("/", orderController.GetAllOrders)
+		orderRoutes.POST("/filter", orderController.GetAllOrders)
 		orderRoutes.GET("/:id", orderController.GetOrderByID)
 		orderRoutes.PUT("/:id", orderController.UpdateOrder)
 		orderRoutes.DELETE("/:id", orderController.DeleteOrder)
@@ -36,7 +36,7 @@ func InitializeRouter() *gin.Engine {
 	cityRoutes := router.Group("/cities")
 	{
 		cityRoutes.POST("/", cityController.CreateCity)
-		cityRoutes.GET("/", cityController.GetAllCities)
+		cityRoutes.POST("/filter", cityController.GetAllCities)
 		cityRoutes.GET("/:id", cityController.GetCityByID)
 		cityRoutes.PUT("/:id", cityController.UpdateCity)
 		cityRoutes.DELETE("/:id", cityController.DeleteCity)
@@ -45,7 +45,7 @@ func InitializeRouter() *gin.Engine {
 	productRoutes := router.Group("/products")
 	{
 		productRoutes.POST("/", productController.CreateProduct)
-		productRoutes.GET("/", productController.GetAllProducts)
+		productRoutes.POST("/filter", productController.GetAllProducts)
 		productRoutes.GET("/:id", productController.GetProductByID)
 		productRoutes.PUT("/:id", productController.UpdateProduct)
 		productRoutes.DELETE("/:id", productController.DeleteProduct)
@@ -54,7 +54,7 @@ func InitializeRouter() *gin.Engine {
 	itemRoutes := router.Group("/items")
 	{
 		itemRoutes.POST("/", itemController.CreateItem)
-		itemRoutes.GET("/", itemController.GetAllItems)
+		itemRoutes.POST("/filter", itemController.GetAllItems)
 		itemRoutes.GET("/:id", itemController.GetItemByID)
 		itemRoutes.PUT("/:id", itemController.UpdateItem)
 		itemRoutes.DELETE("/:id", itemController.DeleteItem)

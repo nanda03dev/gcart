@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/services"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -33,12 +34,18 @@ func (c *CityController) CreateCity(ctx *gin.Context) {
 }
 
 func (c *CityController) GetAllCities(ctx *gin.Context) {
-	citys, err := c.cityService.GetAllCities()
+	var requestFilterBody common.RequestFilterBody
+	if err := ctx.ShouldBindJSON(&requestFilterBody); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	cities, err := c.cityService.GetAllCities(requestFilterBody)
+
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, citys)
+	ctx.JSON(http.StatusOK, cities)
 }
 
 func (c *CityController) GetCityByID(ctx *gin.Context) {

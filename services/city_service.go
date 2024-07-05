@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 
+	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -10,7 +11,7 @@ import (
 
 type CityService interface {
 	CreateCity(city models.City) (models.City, error)
-	GetAllCities() ([]models.City, error)
+	GetAllCities(requestFilterBody common.RequestFilterBody) ([]models.City, error)
 	GetCityByID(id string) (models.City, error)
 	UpdateCity(city models.City) error
 	DeleteCity(id string) error
@@ -29,8 +30,8 @@ func (s *cityService) CreateCity(city models.City) (models.City, error) {
 	return city, s.cityRepository.Create(context.Background(), city)
 }
 
-func (s *cityService) GetAllCities() ([]models.City, error) {
-	return s.cityRepository.GetAll(context.Background(), nil)
+func (s *cityService) GetAllCities(requestFilterBody common.RequestFilterBody) ([]models.City, error) {
+	return s.cityRepository.GetAll(context.Background(), requestFilterBody.ListOfFilter, requestFilterBody.SortBody, requestFilterBody.Size)
 }
 
 func (s *cityService) GetCityByID(id string) (models.City, error) {

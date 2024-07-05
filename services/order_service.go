@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 
+	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
 	"github.com/nanda03dev/go2ms/workers"
@@ -11,7 +12,7 @@ import (
 
 type OrderService interface {
 	CreateOrder(order models.Order) (models.Order, error)
-	GetAllOrders() ([]models.Order, error)
+	GetAllOrders(requestFilterBody common.RequestFilterBody) ([]models.Order, error)
 	GetOrderByID(id string) (models.Order, error)
 	UpdateOrder(order models.Order) error
 	DeleteOrder(id string) error
@@ -28,13 +29,13 @@ func NewOrderService(orderRepository *repositories.OrderRepository) OrderService
 func (s *orderService) CreateOrder(order models.Order) (models.Order, error) {
 	order.ID = primitive.NewObjectID()
 	err := s.orderRepository.Create(context.Background(), order)
-	workers.AddToOrderWorkerChan(order.ID)
+	workers.AddTo3201Chan(order.ID)
 
 	return order, err
 }
 
-func (s *orderService) GetAllOrders() ([]models.Order, error) {
-	return s.orderRepository.GetAll(context.Background(), nil)
+func (s *orderService) GetAllOrders(requestFilterBody common.RequestFilterBody) ([]models.Order, error) {
+	return s.orderRepository.GetAll(context.Background(), requestFilterBody.ListOfFilter, requestFilterBody.SortBody, requestFilterBody.Size)
 }
 
 func (s *orderService) GetOrderByID(id string) (models.Order, error) {

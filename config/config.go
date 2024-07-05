@@ -2,10 +2,13 @@ package config
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -19,20 +22,31 @@ func LoadConfig() {
 	}
 
 	mongoURI := "mongodb://localhost:27017"
-	client, err := mongo.NewClient(options.Client().ApplyURI(mongoURI))
-	if err != nil {
-		log.Fatalf("Failed to create MongoDB client: %v", err)
-	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+	opts := options.Client().ApplyURI(mongoURI).SetConnectTimeout(1 * time.Second).SetServerAPIOptions(serverAPI)
+
+	ctx, cancel := context.WithTimeout(context.TODO(), 1*time.Second)
 	defer cancel()
 
-	err = client.Connect(ctx)
+	client, err := mongo.Connect(ctx, opts)
+
 	if err != nil {
-		log.Fatalf("Failed to connect to MongoDB: %v", err)
-	} else {
-		log.Println("MongoDB connected successfully")
+		println("Connect time out")
+		panic(err)
 	}
 
-	DB = client.Database("order_management_system")
+	// Send a ping to confirm a successful connection
+	var result bson.M
+	if err := client.Database("admin").RunCommand(context.TODO(), bson.D{{Key: "ping", Value: 1}}).Decode(&result); err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Pinged your deployment. You successfully connected to MongoDB!")
+
+	if os.Getenv("PORT") != "" {
+		os.Setenv("PORT", "8080")
+	}
+
+	DB = client.Database("go2ms")
 }

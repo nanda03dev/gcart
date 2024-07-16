@@ -13,7 +13,7 @@ import (
 
 type OrderService interface {
 	CreateOrder(order models.Order) (models.Order, error)
-	GetAllOrders(requestFilterBody common.RequestFilterBody) ([]models.Order, error)
+	GetAllOrders(requestFilterBody common.RequestFilterBodyType) ([]models.Order, error)
 	GetOrderByID(id string) (models.Order, error)
 	UpdateOrder(order models.Order) error
 	DeleteOrder(id string) error
@@ -29,14 +29,19 @@ func NewOrderService(orderRepository *repositories.OrderRepository) OrderService
 
 func (s *orderService) CreateOrder(order models.Order) (models.Order, error) {
 	order.ID = primitive.NewObjectID()
-	order.Code = global_constant.ORDER_SUCCESS_STATUS_CODE.ORDER_INITIATED
+	order.Code = global_constant.OrderSuccessCode.ORDER_INITIATED
 	err := s.orderRepository.Create(context.Background(), order)
-	workers.AddTo3201Chan(order.ID)
+	event := common.EventType{
+		EntityId:      order.ID,
+		EntityType:    global_constant.Entities.Order,
+		OperationType: global_constant.Operations.Create,
+	}
+	workers.AddToChanCRUD(event)
 
 	return order, err
 }
 
-func (s *orderService) GetAllOrders(requestFilterBody common.RequestFilterBody) ([]models.Order, error) {
+func (s *orderService) GetAllOrders(requestFilterBody common.RequestFilterBodyType) ([]models.Order, error) {
 	return s.orderRepository.GetAll(context.Background(), requestFilterBody.ListOfFilter, requestFilterBody.SortBody, requestFilterBody.Size)
 }
 

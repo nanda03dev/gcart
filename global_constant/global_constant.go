@@ -1,14 +1,35 @@
 package global_constant
 
-type StatusCodes struct {
-	ORDER_INITIATED string
-	ORDER_TIMEOUT   string
+import (
+	"github.com/nanda03dev/go2ms/common"
+)
+
+var Entities = common.EntitiesType{
+	Order:   "Order",
+	Item:    "Item",
+	Payment: "Payment",
+	Product: "Product",
+	Event:   "Event",
 }
 
-var ORDER_SUCCESS_STATUS_CODE = StatusCodes{
+var Operations = common.OperationsType{
+	Create: "Create",
+	Update: "Update",
+	Delete: "Delete",
+}
+
+var OrderSuccessCode = common.SuccessCodeType{
 	ORDER_INITIATED: "3201",
 }
 
-var ORDER_ERROR_STATUS_CODE = StatusCodes{
+var OrderErrorCode = common.ErrorCodeType{
 	ORDER_TIMEOUT: "3408",
+}
+
+var PaymentSuccessCode = common.SuccessCodeType{
+	PAYMENT_INITIATED: "5201",
+}
+
+var PaymentErrorCode = common.ErrorCodeType{
+	PAYMENT_TIMEOUT: "5408",
 }

@@ -35,7 +35,7 @@ func (c *EventController) CreateEvent(ctx *gin.Context) {
 }
 
 func (c *EventController) GetAllEvents(ctx *gin.Context) {
-	var requestFilterBody common.RequestFilterBody
+	var requestFilterBody common.RequestFilterBodyType
 	if err := ctx.ShouldBindJSON(&requestFilterBody); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

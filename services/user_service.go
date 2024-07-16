@@ -11,7 +11,7 @@ import (
 
 type UserService interface {
 	CreateUser(user models.User) (models.User, error)
-	GetAllUsers(requestFilterBody common.RequestFilterBody) ([]models.User, error)
+	GetAllUsers(requestFilterBody common.RequestFilterBodyType) ([]models.User, error)
 	GetUserByID(id string) (models.User, error)
 	UpdateUser(user models.User) error
 	DeleteUser(id string) error
@@ -31,7 +31,7 @@ func (s *userService) CreateUser(user models.User) (models.User, error) {
 	return user, s.userRepository.Create(context.Background(), user)
 }
 
-func (s *userService) GetAllUsers(requestFilterBody common.RequestFilterBody) ([]models.User, error) {
+func (s *userService) GetAllUsers(requestFilterBody common.RequestFilterBodyType) ([]models.User, error) {
 	return s.userRepository.GetAll(context.Background(), requestFilterBody.ListOfFilter, requestFilterBody.SortBody, requestFilterBody.Size)
 }
 

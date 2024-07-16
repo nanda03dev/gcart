@@ -4,14 +4,16 @@ import (
 	"context"
 
 	"github.com/nanda03dev/go2ms/common"
+	"github.com/nanda03dev/go2ms/global_constant"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
+	"github.com/nanda03dev/go2ms/workers"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type PaymentService interface {
 	CreatePayment(payment models.Payment) (models.Payment, error)
-	GetAllPayments(requestFilterBody common.RequestFilterBody) ([]models.Payment, error)
+	GetAllPayments(requestFilterBody common.RequestFilterBodyType) ([]models.Payment, error)
 	GetPaymentByID(id string) (models.Payment, error)
 	UpdatePayment(payment models.Payment) error
 	DeletePayment(id string) error
@@ -28,10 +30,17 @@ func NewPaymentService(paymentRepository *repositories.PaymentRepository) Paymen
 func (s *paymentService) CreatePayment(payment models.Payment) (models.Payment, error) {
 	payment.ID = primitive.NewObjectID()
 
+	event := common.EventType{
+		EntityId:      payment.ID,
+		EntityType:    global_constant.Entities.Payment,
+		OperationType: global_constant.Operations.Create,
+	}
+	workers.AddToChanCRUD(event)
+
 	return payment, s.paymentRepository.Create(context.Background(), payment)
 }
 
-func (s *paymentService) GetAllPayments(requestFilterBody common.RequestFilterBody) ([]models.Payment, error) {
+func (s *paymentService) GetAllPayments(requestFilterBody common.RequestFilterBodyType) ([]models.Payment, error) {
 	return s.paymentRepository.GetAll(context.Background(), requestFilterBody.ListOfFilter, requestFilterBody.SortBody, requestFilterBody.Size)
 }
 

@@ -11,7 +11,7 @@ import (
 
 type ItemService interface {
 	CreateItem(item models.Item) (models.Item, error)
-	GetAllCities(requestFilterBody common.RequestFilterBody) ([]models.Item, error)
+	GetAllCities(requestFilterBody common.RequestFilterBodyType) ([]models.Item, error)
 	GetItemByID(id string) (models.Item, error)
 	UpdateItem(item models.Item) error
 	DeleteItem(id string) error
@@ -30,7 +30,7 @@ func (s *itemService) CreateItem(item models.Item) (models.Item, error) {
 	return item, s.itemRepository.Create(context.Background(), item)
 }
 
-func (s *itemService) GetAllCities(requestFilterBody common.RequestFilterBody) ([]models.Item, error) {
+func (s *itemService) GetAllCities(requestFilterBody common.RequestFilterBodyType) ([]models.Item, error) {
 	return s.itemRepository.GetAll(context.Background(), requestFilterBody.ListOfFilter, requestFilterBody.SortBody, requestFilterBody.Size)
 }
 

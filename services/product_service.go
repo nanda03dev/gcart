@@ -11,7 +11,7 @@ import (
 
 type ProductService interface {
 	CreateProduct(product models.Product) (models.Product, error)
-	GetAllProducts(requestFilterBody common.RequestFilterBody) ([]models.Product, error)
+	GetAllProducts(requestFilterBody common.RequestFilterBodyType) ([]models.Product, error)
 	GetProductByID(id string) (models.Product, error)
 	UpdateProduct(product models.Product) error
 	DeleteProduct(id string) error
@@ -31,7 +31,7 @@ func (s *productService) CreateProduct(product models.Product) (models.Product, 
 	return product, s.productRepository.Create(context.Background(), product)
 }
 
-func (s *productService) GetAllProducts(requestFilterBody common.RequestFilterBody) ([]models.Product, error) {
+func (s *productService) GetAllProducts(requestFilterBody common.RequestFilterBodyType) ([]models.Product, error) {
 	return s.productRepository.GetAll(context.Background(), requestFilterBody.ListOfFilter, requestFilterBody.SortBody, requestFilterBody.Size)
 }
 

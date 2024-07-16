@@ -11,7 +11,7 @@ import (
 
 type CityService interface {
 	CreateCity(city models.City) (models.City, error)
-	GetAllCities(requestFilterBody common.RequestFilterBody) ([]models.City, error)
+	GetAllCities(requestFilterBody common.RequestFilterBodyType) ([]models.City, error)
 	GetCityByID(id string) (models.City, error)
 	UpdateCity(city models.City) error
 	DeleteCity(id string) error
@@ -30,7 +30,7 @@ func (s *cityService) CreateCity(city models.City) (models.City, error) {
 	return city, s.cityRepository.Create(context.Background(), city)
 }
 
-func (s *cityService) GetAllCities(requestFilterBody common.RequestFilterBody) ([]models.City, error) {
+func (s *cityService) GetAllCities(requestFilterBody common.RequestFilterBodyType) ([]models.City, error) {
 	return s.cityRepository.GetAll(context.Background(), requestFilterBody.ListOfFilter, requestFilterBody.SortBody, requestFilterBody.Size)
 }
 

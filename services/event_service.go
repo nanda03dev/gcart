@@ -11,7 +11,7 @@ import (
 
 type EventService interface {
 	CreateEvent(event models.Event) (models.Event, error)
-	GetAllEvents(requestFilterBody common.RequestFilterBody) ([]models.Event, error)
+	GetAllEvents(requestFilterBody common.RequestFilterBodyType) ([]models.Event, error)
 	GetEventByID(id string) (models.Event, error)
 	UpdateEvent(event models.Event) error
 	DeleteEvent(id string) error
@@ -30,7 +30,7 @@ func (s *eventService) CreateEvent(event models.Event) (models.Event, error) {
 	return event, s.eventRepository.Create(context.Background(), event)
 }
 
-func (s *eventService) GetAllEvents(requestFilterBody common.RequestFilterBody) ([]models.Event, error) {
+func (s *eventService) GetAllEvents(requestFilterBody common.RequestFilterBodyType) ([]models.Event, error) {
 	return s.eventRepository.GetAll(context.Background(), requestFilterBody.ListOfFilter, requestFilterBody.SortBody, requestFilterBody.Size)
 }
 

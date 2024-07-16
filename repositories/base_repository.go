@@ -30,7 +30,7 @@ func convertKeyLower(key string) string {
 	return strings.ToLower(string(key[0])) + key[1:]
 }
 
-func (r *BaseRepository[T]) GetAll(ctx context.Context, filters common.FiltersBody, sort interface{}, limit interface{}) ([]T, error) {
+func (r *BaseRepository[T]) GetAll(ctx context.Context, filters common.FiltersBodyType, sort interface{}, limit interface{}) ([]T, error) {
 	filter := bson.D{}
 	if filters == nil {
 		filter = bson.D{}
@@ -46,7 +46,7 @@ func (r *BaseRepository[T]) GetAll(ctx context.Context, filters common.FiltersBo
 
 	if sort != nil {
 
-		temp := sort.(common.SortBody)
+		temp := sort.(common.SortBodyType)
 		if temp.Order < 1 {
 			temp.Order = -1
 		}

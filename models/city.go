@@ -1,9 +1,16 @@
 package models
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"github.com/nanda03dev/go2ms/common"
+)
 
 type City struct {
-	ID          primitive.ObjectID `json:"id" bson:"_id,omitempty"`
-	Name        string             `json:"name" bson:"name"`
-	CountryCode string             `json:"countryCode" bson:"countryCode"`
+	DocId       string `json:"docId" bson:"docId"`
+	Name        string `json:"name" bson:"name"`
+	CountryCode string `json:"countryCode" bson:"countryCode"`
+}
+
+var CityGnosql = common.GnoSQLCollectionSchemaType{
+	CollectionName: "cities",
+	IndexKeys:      []string{"countryCode"},
 }

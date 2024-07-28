@@ -1,10 +1,18 @@
 package models
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"github.com/nanda03dev/go2ms/common"
+)
 
 type Payment struct {
-	ID     primitive.ObjectID `json:"id" bson:"_id,omitempty"`
-	Name   string             `json:"name" bson:"name"`
-	Amount int                `json:"amount" bson:"amount"`
-	Code   string             `json:"code" bson:"code"`
+	DocId   string `json:"docId" bson:"docId"`
+	OrderId string `json:"orderId" bson:"orderId"`
+	Name    string `json:"name" bson:"name"`
+	Amount  int    `json:"amount" bson:"amount"`
+	Code    string `json:"code" bson:"code"`
+}
+
+var PaymentGnosql = common.GnoSQLCollectionSchemaType{
+	CollectionName: "payments",
+	IndexKeys:      []string{"orderId"},
 }

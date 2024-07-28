@@ -6,15 +6,15 @@ import (
 	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"github.com/nanda03dev/go2ms/utils"
 )
 
 type EventService interface {
 	CreateEvent(event models.Event) (models.Event, error)
 	GetAllEvents(requestFilterBody common.RequestFilterBodyType) ([]models.Event, error)
-	GetEventByID(id string) (models.Event, error)
+	GetEventByID(docId string) (models.Event, error)
 	UpdateEvent(event models.Event) error
-	DeleteEvent(id string) error
+	DeleteEvent(docId string) error
 }
 
 type eventService struct {
@@ -26,7 +26,7 @@ func NewEventService(eventRepository *repositories.EventRepository) EventService
 }
 
 func (s *eventService) CreateEvent(event models.Event) (models.Event, error) {
-	event.ID = primitive.NewObjectID()
+	event.DocId = utils.Generate16DigitUUID()
 	return event, s.eventRepository.Create(context.Background(), event)
 }
 
@@ -34,23 +34,14 @@ func (s *eventService) GetAllEvents(requestFilterBody common.RequestFilterBodyTy
 	return s.eventRepository.GetAll(context.Background(), requestFilterBody.ListOfFilter, requestFilterBody.SortBody, requestFilterBody.Size)
 }
 
-func (s *eventService) GetEventByID(id string) (models.Event, error) {
-	objectId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return models.Event{}, err
-	}
-
-	return s.eventRepository.GetByID(context.Background(), objectId)
+func (s *eventService) GetEventByID(docId string) (models.Event, error) {
+	return s.eventRepository.GetByID(context.Background(), docId)
 }
 
 func (s *eventService) UpdateEvent(event models.Event) error {
-	return s.eventRepository.Update(context.Background(), event.ID, event)
+	return s.eventRepository.Update(context.Background(), event.DocId, event)
 }
 
-func (s *eventService) DeleteEvent(id string) error {
-	objectId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return err
-	}
-	return s.eventRepository.Delete(context.Background(), objectId)
+func (s *eventService) DeleteEvent(docId string) error {
+	return s.eventRepository.Delete(context.Background(), docId)
 }

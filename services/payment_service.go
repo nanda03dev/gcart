@@ -7,8 +7,8 @@ import (
 	"github.com/nanda03dev/go2ms/global_constant"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
+	"github.com/nanda03dev/go2ms/utils"
 	"github.com/nanda03dev/go2ms/workers"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type PaymentService interface {
@@ -28,10 +28,10 @@ func NewPaymentService(paymentRepository *repositories.PaymentRepository) Paymen
 }
 
 func (s *paymentService) CreatePayment(payment models.Payment) (models.Payment, error) {
-	payment.ID = primitive.NewObjectID()
+	payment.DocId = utils.Generate16DigitUUID()
 
 	event := common.EventType{
-		EntityId:      payment.ID,
+		EntityId:      payment.DocId,
 		EntityType:    global_constant.Entities.Payment,
 		OperationType: global_constant.Operations.Create,
 	}
@@ -44,23 +44,14 @@ func (s *paymentService) GetAllPayments(requestFilterBody common.RequestFilterBo
 	return s.paymentRepository.GetAll(context.Background(), requestFilterBody.ListOfFilter, requestFilterBody.SortBody, requestFilterBody.Size)
 }
 
-func (s *paymentService) GetPaymentByID(id string) (models.Payment, error) {
-	objectId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return models.Payment{}, err
-	}
-
-	return s.paymentRepository.GetByID(context.Background(), objectId)
+func (s *paymentService) GetPaymentByID(docId string) (models.Payment, error) {
+	return s.paymentRepository.GetByID(context.Background(), docId)
 }
 
 func (s *paymentService) UpdatePayment(payment models.Payment) error {
-	return s.paymentRepository.Update(context.Background(), payment.ID, payment)
+	return s.paymentRepository.Update(context.Background(), payment.DocId, payment)
 }
 
-func (s *paymentService) DeletePayment(id string) error {
-	objectId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return err
-	}
-	return s.paymentRepository.Delete(context.Background(), objectId)
+func (s *paymentService) DeletePayment(docId string) error {
+	return s.paymentRepository.Delete(context.Background(), docId)
 }

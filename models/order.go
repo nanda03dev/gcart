@@ -1,11 +1,18 @@
 package models
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"github.com/nanda03dev/go2ms/common"
+)
 
 type Order struct {
-	ID      primitive.ObjectID   `json:"id" bson:"_id,omitempty"`
-	Amount  int                  `json:"amount" bson:"amount"`
-	UserID  primitive.ObjectID   `json:"userId" bson:"userID"`
-	Code    string               `json:"code" bson:"code"`
-	ItemsID []primitive.ObjectID `json:"itemIds" bson:"itemIds"`
+	DocId   string   `json:"docId" bson:"docId"`
+	Amount  int      `json:"amount" bson:"amount"`
+	UserID  string   `json:"userId" bson:"userID"`
+	Code    string   `json:"code" bson:"code"`
+	ItemIds []string `json:"itemIds" bson:"itemIds"`
+}
+
+var OrderGnosql = common.GnoSQLCollectionSchemaType{
+	CollectionName: "orders",
+	IndexKeys:      []string{"userId"},
 }

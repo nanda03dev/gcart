@@ -6,7 +6,7 @@ import (
 	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"github.com/nanda03dev/go2ms/utils"
 )
 
 type UserService interface {
@@ -26,7 +26,7 @@ func NewUserService(userRepository *repositories.UserRepository) UserService {
 }
 
 func (s *userService) CreateUser(user models.User) (models.User, error) {
-	user.ID = primitive.NewObjectID()
+	user.DocId = utils.Generate16DigitUUID()
 
 	return user, s.userRepository.Create(context.Background(), user)
 }
@@ -35,23 +35,14 @@ func (s *userService) GetAllUsers(requestFilterBody common.RequestFilterBodyType
 	return s.userRepository.GetAll(context.Background(), requestFilterBody.ListOfFilter, requestFilterBody.SortBody, requestFilterBody.Size)
 }
 
-func (s *userService) GetUserByID(id string) (models.User, error) {
-	objectId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return models.User{}, err
-	}
-
-	return s.userRepository.GetByID(context.Background(), objectId)
+func (s *userService) GetUserByID(docId string) (models.User, error) {
+	return s.userRepository.GetByID(context.Background(), docId)
 }
 
 func (s *userService) UpdateUser(user models.User) error {
-	return s.userRepository.Update(context.Background(), user.ID, user)
+	return s.userRepository.Update(context.Background(), user.DocId, user)
 }
 
-func (s *userService) DeleteUser(id string) error {
-	objectId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return err
-	}
-	return s.userRepository.Delete(context.Background(), objectId)
+func (s *userService) DeleteUser(docId string) error {
+	return s.userRepository.Delete(context.Background(), docId)
 }

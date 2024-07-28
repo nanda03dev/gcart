@@ -7,7 +7,6 @@ import (
 	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/services"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type ProductController struct {
@@ -66,8 +65,9 @@ func (c *ProductController) UpdateProduct(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	idParam := ctx.Param("id")
-	product.ID, _ = primitive.ObjectIDFromHex(idParam)
+
+	product.DocId = ctx.Param("id")
+
 	if err := c.productService.UpdateProduct(product); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

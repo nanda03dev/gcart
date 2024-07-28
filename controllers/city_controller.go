@@ -7,7 +7,6 @@ import (
 	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/services"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type CityController struct {
@@ -65,8 +64,7 @@ func (c *CityController) UpdateCity(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	idParam := ctx.Param("id")
-	city.ID, _ = primitive.ObjectIDFromHex(idParam)
+	city.DocId = ctx.Param("id")
 	if err := c.cityService.UpdateCity(city); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -75,9 +73,9 @@ func (c *CityController) UpdateCity(ctx *gin.Context) {
 }
 
 func (c *CityController) DeleteCity(ctx *gin.Context) {
-	idParam := ctx.Param("id")
+	DocId := ctx.Param("id")
 
-	if err := c.cityService.DeleteCity(idParam); err != nil {
+	if err := c.cityService.DeleteCity(DocId); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

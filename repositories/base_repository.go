@@ -2,11 +2,11 @@ package repositories
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/nanda03dev/go2ms/common"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -45,12 +45,17 @@ func (r *BaseRepository[T]) GetAll(ctx context.Context, filters common.FiltersBo
 	sortOptions := bson.D{{Key: "_id", Value: 1}}
 
 	if sort != nil {
+		fmt.Printf("sort %v ", sort)
 
 		temp := sort.(common.SortBodyType)
-		if temp.Order < 1 {
-			temp.Order = -1
+
+		if temp.Key != "" {
+			if temp.Order < 1 {
+				temp.Order = -1
+			}
+			sortOptions = bson.D{{Key: convertKeyLower(temp.Key), Value: temp.Order}}
 		}
-		sortOptions = bson.D{{Key: convertKeyLower(temp.Key), Value: temp.Order}}
+
 	}
 
 	findOptions.SetSort(sortOptions)
@@ -91,18 +96,18 @@ func (r *BaseRepository[T]) GetAll(ctx context.Context, filters common.FiltersBo
 	return results, nil
 }
 
-func (r *BaseRepository[T]) GetByID(ctx context.Context, id primitive.ObjectID) (T, error) {
+func (r *BaseRepository[T]) GetByID(ctx context.Context, id string) (T, error) {
 	var result T
-	err := r.collection.FindOne(ctx, bson.M{"_id": id}).Decode(&result)
+	err := r.collection.FindOne(ctx, bson.M{"docId": id}).Decode(&result)
 	return result, err
 }
 
-func (r *BaseRepository[T]) Update(ctx context.Context, id primitive.ObjectID, update T) error {
-	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$set": update})
+func (r *BaseRepository[T]) Update(ctx context.Context, id string, update T) error {
+	_, err := r.collection.UpdateOne(ctx, bson.M{"docId": id}, bson.M{"$set": update})
 	return err
 }
 
-func (r *BaseRepository[T]) Delete(ctx context.Context, id primitive.ObjectID) error {
-	_, err := r.collection.DeleteOne(ctx, bson.M{"_id": id})
+func (r *BaseRepository[T]) Delete(ctx context.Context, id string) error {
+	_, err := r.collection.DeleteOne(ctx, bson.M{"docId": id})
 	return err
 }

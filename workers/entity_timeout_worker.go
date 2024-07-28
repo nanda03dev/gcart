@@ -29,8 +29,8 @@ func StartEntityTimeoutWorker() {
 
 				if order.Code == global_constant.OrderSuccessCode.ORDER_INITIATED {
 					order.Code = global_constant.OrderErrorCode.ORDER_TIMEOUT
-					orderRepository.Update(context.TODO(), order.ID, order)
-					eventRepository.Delete(context.TODO(), event.ID)
+					orderRepository.Update(context.TODO(), order.DocId, order)
+					eventRepository.Delete(context.TODO(), event.DocId)
 				}
 			}
 			if event.EntityType == global_constant.Entities.Payment {
@@ -38,8 +38,8 @@ func StartEntityTimeoutWorker() {
 
 				if payment.Code == global_constant.PaymentSuccessCode.PAYMENT_INITIATED {
 					payment.Code = global_constant.PaymentErrorCode.PAYMENT_TIMEOUT
-					paymentRepository.Update(context.TODO(), payment.ID, payment)
-					eventRepository.Delete(context.TODO(), event.ID)
+					paymentRepository.Update(context.TODO(), payment.DocId, payment)
+					eventRepository.Delete(context.TODO(), event.DocId)
 				}
 			}
 

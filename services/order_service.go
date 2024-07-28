@@ -7,8 +7,8 @@ import (
 	"github.com/nanda03dev/go2ms/global_constant"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
+	"github.com/nanda03dev/go2ms/utils"
 	"github.com/nanda03dev/go2ms/workers"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type OrderService interface {
@@ -28,11 +28,13 @@ func NewOrderService(orderRepository *repositories.OrderRepository) OrderService
 }
 
 func (s *orderService) CreateOrder(order models.Order) (models.Order, error) {
-	order.ID = primitive.NewObjectID()
+	order.DocId = utils.Generate16DigitUUID()
 	order.Code = global_constant.OrderSuccessCode.ORDER_INITIATED
+
 	err := s.orderRepository.Create(context.Background(), order)
+
 	event := common.EventType{
-		EntityId:      order.ID,
+		EntityId:      order.DocId,
 		EntityType:    global_constant.Entities.Order,
 		OperationType: global_constant.Operations.Create,
 	}
@@ -45,23 +47,14 @@ func (s *orderService) GetAllOrders(requestFilterBody common.RequestFilterBodyTy
 	return s.orderRepository.GetAll(context.Background(), requestFilterBody.ListOfFilter, requestFilterBody.SortBody, requestFilterBody.Size)
 }
 
-func (s *orderService) GetOrderByID(id string) (models.Order, error) {
-	objectId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return models.Order{}, err
-	}
-
-	return s.orderRepository.GetByID(context.Background(), objectId)
+func (s *orderService) GetOrderByID(docId string) (models.Order, error) {
+	return s.orderRepository.GetByID(context.Background(), docId)
 }
 
 func (s *orderService) UpdateOrder(order models.Order) error {
-	return s.orderRepository.Update(context.Background(), order.ID, order)
+	return s.orderRepository.Update(context.Background(), order.DocId, order)
 }
 
-func (s *orderService) DeleteOrder(id string) error {
-	objectId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return err
-	}
-	return s.orderRepository.Delete(context.Background(), objectId)
+func (s *orderService) DeleteOrder(docId string) error {
+	return s.orderRepository.Delete(context.Background(), docId)
 }

@@ -1,7 +1,5 @@
 package common
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
-
 type FilterBodyType struct {
 	Key   string
 	Value interface{}
@@ -49,8 +47,13 @@ type OperationsType struct {
 }
 
 type EventType struct {
-	EntityId      primitive.ObjectID
+	EntityId      string
 	EntityType    EntityNameType
 	OperationType OperationNameType
 	RetryCount    int
+}
+
+type GnoSQLCollectionSchemaType struct {
+	CollectionName string
+	IndexKeys      []string
 }

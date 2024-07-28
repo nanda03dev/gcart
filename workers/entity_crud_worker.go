@@ -7,7 +7,6 @@ import (
 	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 var chanCRUD = make(chan common.EventType)
@@ -21,7 +20,6 @@ func StartCRUDWorker() {
 		crudEvent := <-chanCRUD
 
 		event := models.Event{
-			ID:            primitive.NewObjectID(),
 			EntityId:      crudEvent.EntityId,
 			EntityType:    crudEvent.EntityType,
 			OperationType: crudEvent.OperationType,

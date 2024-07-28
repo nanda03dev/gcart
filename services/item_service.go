@@ -6,7 +6,7 @@ import (
 	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"github.com/nanda03dev/go2ms/utils"
 )
 
 type ItemService interface {
@@ -26,7 +26,7 @@ func NewItemService(itemRepository *repositories.ItemRepository) ItemService {
 }
 
 func (s *itemService) CreateItem(item models.Item) (models.Item, error) {
-	item.ID = primitive.NewObjectID()
+	item.DocId = utils.Generate16DigitUUID()
 	return item, s.itemRepository.Create(context.Background(), item)
 }
 
@@ -34,23 +34,15 @@ func (s *itemService) GetAllCities(requestFilterBody common.RequestFilterBodyTyp
 	return s.itemRepository.GetAll(context.Background(), requestFilterBody.ListOfFilter, requestFilterBody.SortBody, requestFilterBody.Size)
 }
 
-func (s *itemService) GetItemByID(id string) (models.Item, error) {
-	objectId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return models.Item{}, err
-	}
+func (s *itemService) GetItemByID(docId string) (models.Item, error) {
 
-	return s.itemRepository.GetByID(context.Background(), objectId)
+	return s.itemRepository.GetByID(context.Background(), docId)
 }
 
 func (s *itemService) UpdateItem(item models.Item) error {
-	return s.itemRepository.Update(context.Background(), item.ID, item)
+	return s.itemRepository.Update(context.Background(), item.DocId, item)
 }
 
-func (s *itemService) DeleteItem(id string) error {
-	objectId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return err
-	}
-	return s.itemRepository.Delete(context.Background(), objectId)
+func (s *itemService) DeleteItem(docId string) error {
+	return s.itemRepository.Delete(context.Background(), docId)
 }

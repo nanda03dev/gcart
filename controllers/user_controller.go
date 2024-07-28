@@ -7,7 +7,6 @@ import (
 	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/services"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type UserController struct {
@@ -66,8 +65,7 @@ func (c *UserController) UpdateUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	idParam := ctx.Param("id")
-	user.ID, _ = primitive.ObjectIDFromHex(idParam)
+	user.DocId = ctx.Param("id")
 	if err := c.userService.UpdateUser(user); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

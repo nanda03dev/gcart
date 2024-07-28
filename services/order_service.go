@@ -52,9 +52,21 @@ func (s *orderService) GetOrderByID(docId string) (models.Order, error) {
 }
 
 func (s *orderService) UpdateOrder(order models.Order) error {
+	event := common.EventType{
+		EntityId:      order.DocId,
+		EntityType:    global_constant.Entities.Order,
+		OperationType: global_constant.Operations.Update,
+	}
+	workers.AddToChanCRUD(event)
 	return s.orderRepository.Update(context.Background(), order.DocId, order)
 }
 
 func (s *orderService) DeleteOrder(docId string) error {
+	event := common.EventType{
+		EntityId:      docId,
+		EntityType:    global_constant.Entities.Order,
+		OperationType: global_constant.Operations.Delete,
+	}
+	workers.AddToChanCRUD(event)
 	return s.orderRepository.Delete(context.Background(), docId)
 }

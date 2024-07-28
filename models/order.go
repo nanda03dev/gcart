@@ -1,8 +1,6 @@
 package models
 
-import (
-	"github.com/nanda03dev/go2ms/common"
-)
+import "github.com/nanda03dev/gnosql_client"
 
 type Order struct {
 	DocId   string   `json:"docId" bson:"docId"`
@@ -12,7 +10,17 @@ type Order struct {
 	ItemIds []string `json:"itemIds" bson:"itemIds"`
 }
 
-var OrderGnosql = common.GnoSQLCollectionSchemaType{
+var OrderGnosql = gnosql_client.CollectionInput{
 	CollectionName: "orders",
 	IndexKeys:      []string{"userId"},
+}
+
+func (order Order) ToDocument() gnosql_client.Document {
+	return gnosql_client.Document{
+		"docId":   order.DocId,
+		"amount":  order.Amount,
+		"userId":  order.UserID,
+		"code":    order.Code,
+		"itemIds": order.ItemIds,
+	}
 }

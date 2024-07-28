@@ -4,9 +4,11 @@ import (
 	"context"
 
 	"github.com/nanda03dev/go2ms/common"
+	"github.com/nanda03dev/go2ms/global_constant"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
 	"github.com/nanda03dev/go2ms/utils"
+	"github.com/nanda03dev/go2ms/workers"
 )
 
 type ProductService interface {
@@ -28,6 +30,13 @@ func NewProductService(productRepository *repositories.ProductRepository) Produc
 func (s *productService) CreateProduct(product models.Product) (models.Product, error) {
 	product.DocId = utils.Generate16DigitUUID()
 
+	event := common.EventType{
+		EntityId:      product.DocId,
+		EntityType:    global_constant.Entities.Product,
+		OperationType: global_constant.Operations.Create,
+	}
+	workers.AddToChanCRUD(event)
+
 	return product, s.productRepository.Create(context.Background(), product)
 }
 
@@ -40,9 +49,21 @@ func (s *productService) GetProductByID(docId string) (models.Product, error) {
 }
 
 func (s *productService) UpdateProduct(product models.Product) error {
+	event := common.EventType{
+		EntityId:      product.DocId,
+		EntityType:    global_constant.Entities.Product,
+		OperationType: global_constant.Operations.Update,
+	}
+	workers.AddToChanCRUD(event)
 	return s.productRepository.Update(context.Background(), product.DocId, product)
 }
 
 func (s *productService) DeleteProduct(docId string) error {
+	event := common.EventType{
+		EntityId:      docId,
+		EntityType:    global_constant.Entities.Product,
+		OperationType: global_constant.Operations.Delete,
+	}
+	workers.AddToChanCRUD(event)
 	return s.productRepository.Delete(context.Background(), docId)
 }

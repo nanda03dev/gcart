@@ -4,9 +4,11 @@ import (
 	"context"
 
 	"github.com/nanda03dev/go2ms/common"
+	"github.com/nanda03dev/go2ms/global_constant"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
 	"github.com/nanda03dev/go2ms/utils"
+	"github.com/nanda03dev/go2ms/workers"
 )
 
 type ItemService interface {
@@ -27,6 +29,12 @@ func NewItemService(itemRepository *repositories.ItemRepository) ItemService {
 
 func (s *itemService) CreateItem(item models.Item) (models.Item, error) {
 	item.DocId = utils.Generate16DigitUUID()
+	event := common.EventType{
+		EntityId:      item.DocId,
+		EntityType:    global_constant.Entities.Item,
+		OperationType: global_constant.Operations.Create,
+	}
+	workers.AddToChanCRUD(event)
 	return item, s.itemRepository.Create(context.Background(), item)
 }
 
@@ -40,9 +48,22 @@ func (s *itemService) GetItemByID(docId string) (models.Item, error) {
 }
 
 func (s *itemService) UpdateItem(item models.Item) error {
+	event := common.EventType{
+		EntityId:      item.DocId,
+		EntityType:    global_constant.Entities.Item,
+		OperationType: global_constant.Operations.Update,
+	}
+	workers.AddToChanCRUD(event)
+
 	return s.itemRepository.Update(context.Background(), item.DocId, item)
 }
 
 func (s *itemService) DeleteItem(docId string) error {
+	event := common.EventType{
+		EntityId:      docId,
+		EntityType:    global_constant.Entities.Item,
+		OperationType: global_constant.Operations.Delete,
+	}
+	workers.AddToChanCRUD(event)
 	return s.itemRepository.Delete(context.Background(), docId)
 }

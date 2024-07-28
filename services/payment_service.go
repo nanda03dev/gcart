@@ -49,9 +49,22 @@ func (s *paymentService) GetPaymentByID(docId string) (models.Payment, error) {
 }
 
 func (s *paymentService) UpdatePayment(payment models.Payment) error {
+	event := common.EventType{
+		EntityId:      payment.DocId,
+		EntityType:    global_constant.Entities.Payment,
+		OperationType: global_constant.Operations.Update,
+	}
+	workers.AddToChanCRUD(event)
+
 	return s.paymentRepository.Update(context.Background(), payment.DocId, payment)
 }
 
 func (s *paymentService) DeletePayment(docId string) error {
+	event := common.EventType{
+		EntityId:      docId,
+		EntityType:    global_constant.Entities.Payment,
+		OperationType: global_constant.Operations.Delete,
+	}
+	workers.AddToChanCRUD(event)
 	return s.paymentRepository.Delete(context.Background(), docId)
 }

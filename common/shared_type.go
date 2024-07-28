@@ -33,6 +33,8 @@ type EntityNameType string
 type OperationNameType string
 
 type EntitiesType struct {
+	City    EntityNameType
+	User    EntityNameType
 	Order   EntityNameType
 	Item    EntityNameType
 	Payment EntityNameType

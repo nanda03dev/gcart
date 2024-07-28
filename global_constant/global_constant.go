@@ -5,6 +5,8 @@ import (
 )
 
 var Entities = common.EntitiesType{
+	City:    "City",
+	User:    "User",
 	Order:   "Order",
 	Item:    "Item",
 	Payment: "Payment",

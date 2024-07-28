@@ -4,9 +4,11 @@ import (
 	"context"
 
 	"github.com/nanda03dev/go2ms/common"
+	"github.com/nanda03dev/go2ms/global_constant"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
 	"github.com/nanda03dev/go2ms/utils"
+	"github.com/nanda03dev/go2ms/workers"
 )
 
 type CityService interface {
@@ -27,6 +29,13 @@ func NewCityService(cityRepository *repositories.CityRepository) CityService {
 
 func (s *cityService) CreateCity(city models.City) (models.City, error) {
 	city.DocId = utils.Generate16DigitUUID()
+	event := common.EventType{
+		EntityId:      city.DocId,
+		EntityType:    global_constant.Entities.City,
+		OperationType: global_constant.Operations.Create,
+	}
+	workers.AddToChanCRUD(event)
+
 	return city, s.cityRepository.Create(context.Background(), city)
 }
 
@@ -39,9 +48,22 @@ func (s *cityService) GetCityByID(docId string) (models.City, error) {
 }
 
 func (s *cityService) UpdateCity(city models.City) error {
+	event := common.EventType{
+		EntityId:      city.DocId,
+		EntityType:    global_constant.Entities.City,
+		OperationType: global_constant.Operations.Update,
+	}
+	workers.AddToChanCRUD(event)
+
 	return s.cityRepository.Update(context.Background(), city.DocId, city)
 }
 
 func (s *cityService) DeleteCity(docId string) error {
+	event := common.EventType{
+		EntityId:      docId,
+		EntityType:    global_constant.Entities.City,
+		OperationType: global_constant.Operations.Delete,
+	}
+	workers.AddToChanCRUD(event)
 	return s.cityRepository.Delete(context.Background(), docId)
 }

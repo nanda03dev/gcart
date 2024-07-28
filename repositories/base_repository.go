@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/nanda03dev/go2ms/common"
@@ -45,7 +44,6 @@ func (r *BaseRepository[T]) GetAll(ctx context.Context, filters common.FiltersBo
 	sortOptions := bson.D{{Key: "_id", Value: 1}}
 
 	if sort != nil {
-		fmt.Printf("sort %v ", sort)
 
 		temp := sort.(common.SortBodyType)
 

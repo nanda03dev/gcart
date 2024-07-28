@@ -9,12 +9,15 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/nanda03dev/gnosql_client"
+	"github.com/nanda03dev/go2ms/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var DB *mongo.Database
+var GnoSQLDB *gnosql_client.Database
 
 func LoadConfig() {
 	err := godotenv.Load()
@@ -32,7 +35,24 @@ func LoadConfig() {
 }
 
 func SetupDatabase() *mongo.Database {
+	DatabaseName := "go2ms"
+
 	mongoURI := "mongodb://localhost:27017"
+
+	GnoSQLClient := gnosql_client.Connect("localhost:5455", true)
+
+	collections := []gnosql_client.CollectionInput{
+		models.CityGnosql,
+		models.ItemGnosql,
+		models.OrderGnosql,
+		models.PaymentGnosql,
+		models.ProductGnosql,
+		models.UserGnosql,
+	}
+
+	GnoSQLClient.Connect(DatabaseName, collections)
+
+	GnoSQLDB = GnoSQLClient.DB[DatabaseName]
 
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(mongoURI).SetConnectTimeout(1 * time.Second).SetServerAPIOptions(serverAPI)

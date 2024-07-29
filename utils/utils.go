@@ -29,15 +29,15 @@ func ExtractTimestampFromUUID(uuidStr string) time.Time {
 
 func GetGnosqlCollection(entityType common.EntityNameType) gnosql_client.CollectionInput {
 	switch entityType {
-	case global_constant.Entities.City:
+	case global_constant.ENTITY_CITY:
 		return models.CityGnosql
-	case global_constant.Entities.Product:
+	case global_constant.ENTITY_PRODUCT:
 		return models.ProductGnosql
-	case global_constant.Entities.Order:
+	case global_constant.ENTITY_ORDER:
 		return models.OrderGnosql
-	case global_constant.Entities.Item:
+	case global_constant.ENTITY_ITEM:
 		return models.ItemGnosql
-	case global_constant.Entities.Payment:
+	case global_constant.ENTITY_PAYMENT:
 		return models.PaymentGnosql
 	default:
 		return gnosql_client.CollectionInput{}

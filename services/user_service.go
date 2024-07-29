@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 
 	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/global_constant"
@@ -14,9 +15,9 @@ import (
 type UserService interface {
 	CreateUser(user models.User) (models.User, error)
 	GetAllUsers(requestFilterBody common.RequestFilterBodyType) ([]models.User, error)
-	GetUserByID(id string) (models.User, error)
+	GetUserByID(docId string) (models.User, error)
 	UpdateUser(user models.User) error
-	DeleteUser(id string) error
+	DeleteUser(docId string) error
 }
 
 type userService struct {
@@ -29,15 +30,12 @@ func NewUserService(userRepository *repositories.UserRepository) UserService {
 
 func (s *userService) CreateUser(user models.User) (models.User, error) {
 	user.DocId = utils.Generate16DigitUUID()
+	createError := s.userRepository.Create(context.Background(), user)
 
-	event := common.EventType{
-		EntityId:      user.DocId,
-		EntityType:    global_constant.Entities.User,
-		OperationType: global_constant.Operations.Create,
-	}
+	event := user.ToEvent(global_constant.OPERATION_CREATE)
 	workers.AddToChanCRUD(event)
 
-	return user, s.userRepository.Create(context.Background(), user)
+	return user, createError
 }
 
 func (s *userService) GetAllUsers(requestFilterBody common.RequestFilterBodyType) ([]models.User, error) {
@@ -49,22 +47,24 @@ func (s *userService) GetUserByID(docId string) (models.User, error) {
 }
 
 func (s *userService) UpdateUser(user models.User) error {
-	event := common.EventType{
-		EntityId:      user.DocId,
-		EntityType:    global_constant.Entities.User,
-		OperationType: global_constant.Operations.Update,
-	}
+	updateError := s.userRepository.Update(context.Background(), user.DocId, user)
+
+	event := user.ToEvent(global_constant.OPERATION_UPDATE)
 	workers.AddToChanCRUD(event)
-	return s.userRepository.Update(context.Background(), user.DocId, user)
+
+	return updateError
 }
 
 func (s *userService) DeleteUser(docId string) error {
-	event := common.EventType{
-		EntityId:      docId,
-		EntityType:    global_constant.Entities.User,
-		OperationType: global_constant.Operations.Delete,
+	user, getByIdError := s.userRepository.GetByID(context.Background(), docId)
+
+	if getByIdError != nil {
+		return errors.New("entity not found")
 	}
+	deleteError := s.userRepository.Delete(context.Background(), docId)
+
+	event := user.ToEvent(global_constant.OPERATION_DELETE)
 	workers.AddToChanCRUD(event)
 
-	return s.userRepository.Delete(context.Background(), docId)
+	return deleteError
 }

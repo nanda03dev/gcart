@@ -1,6 +1,10 @@
 package models
 
-import "github.com/nanda03dev/gnosql_client"
+import (
+	"github.com/nanda03dev/gnosql_client"
+	"github.com/nanda03dev/go2ms/common"
+	"github.com/nanda03dev/go2ms/global_constant"
+)
 
 type User struct {
 	DocId   string `json:"docId" bson:"docId"`
@@ -22,5 +26,13 @@ func (user User) ToDocument() gnosql_client.Document {
 		"email":   user.Email,
 		"address": user.Address,
 		"cityId":  user.CityID,
+	}
+}
+
+func (user User) ToEvent(operationType common.OperationType) common.EventType {
+	return common.EventType{
+		EntityId:      user.DocId,
+		EntityType:    global_constant.ENTITY_USER,
+		OperationType: operationType,
 	}
 }

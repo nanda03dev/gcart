@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 
 	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/global_constant"
@@ -14,9 +15,9 @@ import (
 type PaymentService interface {
 	CreatePayment(payment models.Payment) (models.Payment, error)
 	GetAllPayments(requestFilterBody common.RequestFilterBodyType) ([]models.Payment, error)
-	GetPaymentByID(id string) (models.Payment, error)
+	GetPaymentByID(docId string) (models.Payment, error)
 	UpdatePayment(payment models.Payment) error
-	DeletePayment(id string) error
+	DeletePayment(docId string) error
 }
 
 type paymentService struct {
@@ -29,15 +30,13 @@ func NewPaymentService(paymentRepository *repositories.PaymentRepository) Paymen
 
 func (s *paymentService) CreatePayment(payment models.Payment) (models.Payment, error) {
 	payment.DocId = utils.Generate16DigitUUID()
+	payment.Code = global_constant.PAYMENT_INITIATED
+	createError := s.paymentRepository.Create(context.Background(), payment)
 
-	event := common.EventType{
-		EntityId:      payment.DocId,
-		EntityType:    global_constant.Entities.Payment,
-		OperationType: global_constant.Operations.Create,
-	}
+	event := payment.ToEvent(global_constant.OPERATION_CREATE)
 	workers.AddToChanCRUD(event)
 
-	return payment, s.paymentRepository.Create(context.Background(), payment)
+	return payment, createError
 }
 
 func (s *paymentService) GetAllPayments(requestFilterBody common.RequestFilterBodyType) ([]models.Payment, error) {
@@ -49,22 +48,24 @@ func (s *paymentService) GetPaymentByID(docId string) (models.Payment, error) {
 }
 
 func (s *paymentService) UpdatePayment(payment models.Payment) error {
-	event := common.EventType{
-		EntityId:      payment.DocId,
-		EntityType:    global_constant.Entities.Payment,
-		OperationType: global_constant.Operations.Update,
-	}
+	updateError := s.paymentRepository.Update(context.Background(), payment.DocId, payment)
+
+	event := payment.ToEvent(global_constant.OPERATION_UPDATE)
 	workers.AddToChanCRUD(event)
 
-	return s.paymentRepository.Update(context.Background(), payment.DocId, payment)
+	return updateError
 }
 
 func (s *paymentService) DeletePayment(docId string) error {
-	event := common.EventType{
-		EntityId:      docId,
-		EntityType:    global_constant.Entities.Payment,
-		OperationType: global_constant.Operations.Delete,
+	payment, getByIdError := s.paymentRepository.GetByID(context.Background(), docId)
+
+	if getByIdError != nil {
+		return errors.New("entity not found")
 	}
+	deleteError := s.paymentRepository.Delete(context.Background(), docId)
+
+	event := payment.ToEvent(global_constant.OPERATION_DELETE)
 	workers.AddToChanCRUD(event)
-	return s.paymentRepository.Delete(context.Background(), docId)
+
+	return deleteError
 }

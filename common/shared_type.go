@@ -18,40 +18,14 @@ type RequestFilterBodyType struct {
 	SortBody     SortBodyType    `json:"sort"`
 }
 
-type SuccessCodeType struct {
-	ORDER_INITIATED   string
-	ORDER_TIMEOUT     string
-	PAYMENT_INITIATED string
-}
-
-type ErrorCodeType struct {
-	ORDER_TIMEOUT   string
-	PAYMENT_TIMEOUT string
-}
-
 type EntityNameType string
-type OperationNameType string
-
-type EntitiesType struct {
-	City    EntityNameType
-	User    EntityNameType
-	Order   EntityNameType
-	Item    EntityNameType
-	Payment EntityNameType
-	Product EntityNameType
-	Event   EntityNameType
-}
-
-type OperationsType struct {
-	Create OperationNameType
-	Update OperationNameType
-	Delete OperationNameType
-}
+type OperationType string
+type StatusCode string
 
 type EventType struct {
 	EntityId      string
 	EntityType    EntityNameType
-	OperationType OperationNameType
+	OperationType OperationType
 	RetryCount    int
 }
 

@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 
 	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/global_constant"
@@ -29,14 +30,12 @@ func NewCityService(cityRepository *repositories.CityRepository) CityService {
 
 func (s *cityService) CreateCity(city models.City) (models.City, error) {
 	city.DocId = utils.Generate16DigitUUID()
-	event := common.EventType{
-		EntityId:      city.DocId,
-		EntityType:    global_constant.Entities.City,
-		OperationType: global_constant.Operations.Create,
-	}
+	createError := s.cityRepository.Create(context.Background(), city)
+
+	event := city.ToEvent(global_constant.OPERATION_CREATE)
 	workers.AddToChanCRUD(event)
 
-	return city, s.cityRepository.Create(context.Background(), city)
+	return city, createError
 }
 
 func (s *cityService) GetAllCities(requestFilterBody common.RequestFilterBodyType) ([]models.City, error) {
@@ -48,22 +47,25 @@ func (s *cityService) GetCityByID(docId string) (models.City, error) {
 }
 
 func (s *cityService) UpdateCity(city models.City) error {
-	event := common.EventType{
-		EntityId:      city.DocId,
-		EntityType:    global_constant.Entities.City,
-		OperationType: global_constant.Operations.Update,
-	}
+
+	updateError := s.cityRepository.Update(context.Background(), city.DocId, city)
+
+	event := city.ToEvent(global_constant.OPERATION_UPDATE)
 	workers.AddToChanCRUD(event)
 
-	return s.cityRepository.Update(context.Background(), city.DocId, city)
+	return updateError
 }
 
 func (s *cityService) DeleteCity(docId string) error {
-	event := common.EventType{
-		EntityId:      docId,
-		EntityType:    global_constant.Entities.City,
-		OperationType: global_constant.Operations.Delete,
+	city, getByIdError := s.cityRepository.GetByID(context.Background(), docId)
+
+	if getByIdError != nil {
+		return errors.New("entity not found")
 	}
+	deleteError := s.cityRepository.Delete(context.Background(), docId)
+
+	event := city.ToEvent(global_constant.OPERATION_DELETE)
 	workers.AddToChanCRUD(event)
-	return s.cityRepository.Delete(context.Background(), docId)
+
+	return deleteError
 }

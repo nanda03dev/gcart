@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 
 	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/global_constant"
@@ -14,9 +15,9 @@ import (
 type ProductService interface {
 	CreateProduct(product models.Product) (models.Product, error)
 	GetAllProducts(requestFilterBody common.RequestFilterBodyType) ([]models.Product, error)
-	GetProductByID(id string) (models.Product, error)
+	GetProductByID(docId string) (models.Product, error)
 	UpdateProduct(product models.Product) error
-	DeleteProduct(id string) error
+	DeleteProduct(docId string) error
 }
 
 type productService struct {
@@ -29,15 +30,12 @@ func NewProductService(productRepository *repositories.ProductRepository) Produc
 
 func (s *productService) CreateProduct(product models.Product) (models.Product, error) {
 	product.DocId = utils.Generate16DigitUUID()
+	createError := s.productRepository.Create(context.Background(), product)
 
-	event := common.EventType{
-		EntityId:      product.DocId,
-		EntityType:    global_constant.Entities.Product,
-		OperationType: global_constant.Operations.Create,
-	}
+	event := product.ToEvent(global_constant.OPERATION_CREATE)
 	workers.AddToChanCRUD(event)
 
-	return product, s.productRepository.Create(context.Background(), product)
+	return product, createError
 }
 
 func (s *productService) GetAllProducts(requestFilterBody common.RequestFilterBodyType) ([]models.Product, error) {
@@ -49,21 +47,24 @@ func (s *productService) GetProductByID(docId string) (models.Product, error) {
 }
 
 func (s *productService) UpdateProduct(product models.Product) error {
-	event := common.EventType{
-		EntityId:      product.DocId,
-		EntityType:    global_constant.Entities.Product,
-		OperationType: global_constant.Operations.Update,
-	}
+	updateError := s.productRepository.Update(context.Background(), product.DocId, product)
+
+	event := product.ToEvent(global_constant.OPERATION_UPDATE)
 	workers.AddToChanCRUD(event)
-	return s.productRepository.Update(context.Background(), product.DocId, product)
+
+	return updateError
 }
 
 func (s *productService) DeleteProduct(docId string) error {
-	event := common.EventType{
-		EntityId:      docId,
-		EntityType:    global_constant.Entities.Product,
-		OperationType: global_constant.Operations.Delete,
+	product, getByIdError := s.productRepository.GetByID(context.Background(), docId)
+
+	if getByIdError != nil {
+		return errors.New("entity not found")
 	}
+	deleteError := s.productRepository.Delete(context.Background(), docId)
+
+	event := product.ToEvent(global_constant.OPERATION_DELETE)
 	workers.AddToChanCRUD(event)
-	return s.productRepository.Delete(context.Background(), docId)
+
+	return deleteError
 }

@@ -2,6 +2,8 @@ package models
 
 import (
 	"github.com/nanda03dev/gnosql_client"
+	"github.com/nanda03dev/go2ms/common"
+	"github.com/nanda03dev/go2ms/global_constant"
 )
 
 type Item struct {
@@ -22,5 +24,13 @@ func (item Item) ToDocument() gnosql_client.Document {
 		"name":   item.Name,
 		"amount": item.Amount,
 		"status": item.Status,
+	}
+}
+
+func (item Item) ToEvent(operationType common.OperationType) common.EventType {
+	return common.EventType{
+		EntityId:      item.DocId,
+		EntityType:    global_constant.ENTITY_ITEM,
+		OperationType: operationType,
 	}
 }

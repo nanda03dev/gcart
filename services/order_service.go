@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 
 	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/global_constant"
@@ -14,9 +15,9 @@ import (
 type OrderService interface {
 	CreateOrder(order models.Order) (models.Order, error)
 	GetAllOrders(requestFilterBody common.RequestFilterBodyType) ([]models.Order, error)
-	GetOrderByID(id string) (models.Order, error)
+	GetOrderByID(docId string) (models.Order, error)
 	UpdateOrder(order models.Order) error
-	DeleteOrder(id string) error
+	DeleteOrder(docId string) error
 }
 
 type orderService struct {
@@ -29,18 +30,13 @@ func NewOrderService(orderRepository *repositories.OrderRepository) OrderService
 
 func (s *orderService) CreateOrder(order models.Order) (models.Order, error) {
 	order.DocId = utils.Generate16DigitUUID()
-	order.Code = global_constant.OrderSuccessCode.ORDER_INITIATED
+	order.Code = global_constant.ORDER_INITIATED
+	createError := s.orderRepository.Create(context.Background(), order)
 
-	err := s.orderRepository.Create(context.Background(), order)
-
-	event := common.EventType{
-		EntityId:      order.DocId,
-		EntityType:    global_constant.Entities.Order,
-		OperationType: global_constant.Operations.Create,
-	}
+	event := order.ToEvent(global_constant.OPERATION_CREATE)
 	workers.AddToChanCRUD(event)
 
-	return order, err
+	return order, createError
 }
 
 func (s *orderService) GetAllOrders(requestFilterBody common.RequestFilterBodyType) ([]models.Order, error) {
@@ -52,21 +48,24 @@ func (s *orderService) GetOrderByID(docId string) (models.Order, error) {
 }
 
 func (s *orderService) UpdateOrder(order models.Order) error {
-	event := common.EventType{
-		EntityId:      order.DocId,
-		EntityType:    global_constant.Entities.Order,
-		OperationType: global_constant.Operations.Update,
-	}
+	updateError := s.orderRepository.Update(context.Background(), order.DocId, order)
+
+	event := order.ToEvent(global_constant.OPERATION_UPDATE)
 	workers.AddToChanCRUD(event)
-	return s.orderRepository.Update(context.Background(), order.DocId, order)
+
+	return updateError
 }
 
 func (s *orderService) DeleteOrder(docId string) error {
-	event := common.EventType{
-		EntityId:      docId,
-		EntityType:    global_constant.Entities.Order,
-		OperationType: global_constant.Operations.Delete,
+	order, getByIdError := s.orderRepository.GetByID(context.Background(), docId)
+
+	if getByIdError != nil {
+		return errors.New("entity not found")
 	}
+	deleteError := s.orderRepository.Delete(context.Background(), docId)
+
+	event := order.ToEvent(global_constant.OPERATION_DELETE)
 	workers.AddToChanCRUD(event)
-	return s.orderRepository.Delete(context.Background(), docId)
+
+	return deleteError
 }

@@ -1,6 +1,10 @@
 package models
 
-import "github.com/nanda03dev/gnosql_client"
+import (
+	"github.com/nanda03dev/gnosql_client"
+	"github.com/nanda03dev/go2ms/common"
+	"github.com/nanda03dev/go2ms/global_constant"
+)
 
 type Product struct {
 	DocId  string `json:"docId" bson:"docId"`
@@ -20,5 +24,13 @@ func (product Product) ToDocument() gnosql_client.Document {
 		"name":   product.Name,
 		"amount": product.Amount,
 		"status": product.Status,
+	}
+}
+
+func (product Product) ToEvent(operationType common.OperationType) common.EventType {
+	return common.EventType{
+		EntityId:      product.DocId,
+		EntityType:    global_constant.ENTITY_PRODUCT,
+		OperationType: operationType,
 	}
 }

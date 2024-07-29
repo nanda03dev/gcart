@@ -39,7 +39,7 @@ func (c *ItemController) GetAllItems(ctx *gin.Context) {
 		return
 	}
 
-	items, err := c.itemService.GetAllCities(requestFilterBody)
+	items, err := c.itemService.GetAllItems(requestFilterBody)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

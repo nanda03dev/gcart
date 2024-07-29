@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 
 	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/global_constant"
@@ -13,10 +14,10 @@ import (
 
 type ItemService interface {
 	CreateItem(item models.Item) (models.Item, error)
-	GetAllCities(requestFilterBody common.RequestFilterBodyType) ([]models.Item, error)
-	GetItemByID(id string) (models.Item, error)
+	GetAllItems(requestFilterBody common.RequestFilterBodyType) ([]models.Item, error)
+	GetItemByID(docId string) (models.Item, error)
 	UpdateItem(item models.Item) error
-	DeleteItem(id string) error
+	DeleteItem(docId string) error
 }
 
 type itemService struct {
@@ -29,41 +30,41 @@ func NewItemService(itemRepository *repositories.ItemRepository) ItemService {
 
 func (s *itemService) CreateItem(item models.Item) (models.Item, error) {
 	item.DocId = utils.Generate16DigitUUID()
-	event := common.EventType{
-		EntityId:      item.DocId,
-		EntityType:    global_constant.Entities.Item,
-		OperationType: global_constant.Operations.Create,
-	}
+	createError := s.itemRepository.Create(context.Background(), item)
+
+	event := item.ToEvent(global_constant.OPERATION_CREATE)
 	workers.AddToChanCRUD(event)
-	return item, s.itemRepository.Create(context.Background(), item)
+
+	return item, createError
 }
 
-func (s *itemService) GetAllCities(requestFilterBody common.RequestFilterBodyType) ([]models.Item, error) {
+func (s *itemService) GetAllItems(requestFilterBody common.RequestFilterBodyType) ([]models.Item, error) {
 	return s.itemRepository.GetAll(context.Background(), requestFilterBody.ListOfFilter, requestFilterBody.SortBody, requestFilterBody.Size)
 }
 
 func (s *itemService) GetItemByID(docId string) (models.Item, error) {
-
 	return s.itemRepository.GetByID(context.Background(), docId)
 }
 
 func (s *itemService) UpdateItem(item models.Item) error {
-	event := common.EventType{
-		EntityId:      item.DocId,
-		EntityType:    global_constant.Entities.Item,
-		OperationType: global_constant.Operations.Update,
-	}
+	updateError := s.itemRepository.Update(context.Background(), item.DocId, item)
+
+	event := item.ToEvent(global_constant.OPERATION_UPDATE)
 	workers.AddToChanCRUD(event)
 
-	return s.itemRepository.Update(context.Background(), item.DocId, item)
+	return updateError
 }
 
 func (s *itemService) DeleteItem(docId string) error {
-	event := common.EventType{
-		EntityId:      docId,
-		EntityType:    global_constant.Entities.Item,
-		OperationType: global_constant.Operations.Delete,
+	item, getByIdError := s.itemRepository.GetByID(context.Background(), docId)
+
+	if getByIdError != nil {
+		return errors.New("entity not found")
 	}
+	deleteError := s.itemRepository.Delete(context.Background(), docId)
+
+	event := item.ToEvent(global_constant.OPERATION_DELETE)
 	workers.AddToChanCRUD(event)
-	return s.itemRepository.Delete(context.Background(), docId)
+
+	return deleteError
 }

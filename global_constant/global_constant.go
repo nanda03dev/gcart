@@ -4,34 +4,28 @@ import (
 	"github.com/nanda03dev/go2ms/common"
 )
 
-var Entities = common.EntitiesType{
-	City:    "City",
-	User:    "User",
-	Order:   "Order",
-	Item:    "Item",
-	Payment: "Payment",
-	Product: "Product",
-	Event:   "Event",
-}
+const (
+	ENTITY_CITY    common.EntityNameType = "CITY"
+	ENTITY_USER    common.EntityNameType = "USER"
+	ENTITY_ORDER   common.EntityNameType = "ORDER"
+	ENTITY_ITEM    common.EntityNameType = "ITEM"
+	ENTITY_PAYMENT common.EntityNameType = "PAYMENT"
+	ENTITY_PRODUCT common.EntityNameType = "PRODUCT"
+	ENTITY_EVENT   common.EntityNameType = "EVENT"
+)
 
-var Operations = common.OperationsType{
-	Create: "Create",
-	Update: "Update",
-	Delete: "Delete",
-}
+const (
+	OPERATION_CREATE common.OperationType = "CREATE"
+	OPERATION_UPDATE common.OperationType = "UPDATE"
+	OPERATION_DELETE common.OperationType = "DELETE"
+)
 
-var OrderSuccessCode = common.SuccessCodeType{
-	ORDER_INITIATED: "3201",
-}
+const (
+	// Order status code
+	ORDER_INITIATED common.StatusCode = "3201"
+	ORDER_TIMEOUT   common.StatusCode = "3408"
 
-var OrderErrorCode = common.ErrorCodeType{
-	ORDER_TIMEOUT: "3408",
-}
-
-var PaymentSuccessCode = common.SuccessCodeType{
-	PAYMENT_INITIATED: "5201",
-}
-
-var PaymentErrorCode = common.ErrorCodeType{
-	PAYMENT_TIMEOUT: "5408",
-}
+	// Payment status code
+	PAYMENT_INITIATED common.StatusCode = "5201"
+	PAYMENT_TIMEOUT   common.StatusCode = "5408"
+)

@@ -42,32 +42,32 @@ func StartCRUDWorker() {
 		var docmentToCreate gnosql_client.Document
 
 		switch event.EntityType {
-		case global_constant.Entities.City:
+		case global_constant.ENTITY_CITY:
 			{
 				city, _ := cityRepository.GetByID(context.TODO(), event.EntityId)
 				docmentToCreate = city.ToDocument()
 			}
-		case global_constant.Entities.User:
+		case global_constant.ENTITY_USER:
 			{
 				user, _ := userRepository.GetByID(context.TODO(), event.EntityId)
 				docmentToCreate = user.ToDocument()
 			}
-		case global_constant.Entities.Product:
+		case global_constant.ENTITY_PRODUCT:
 			{
 				product, _ := productRepository.GetByID(context.TODO(), event.EntityId)
 				docmentToCreate = product.ToDocument()
 			}
-		case global_constant.Entities.Order:
+		case global_constant.ENTITY_ORDER:
 			{
 				order, _ := orderRepository.GetByID(context.TODO(), event.EntityId)
 				docmentToCreate = order.ToDocument()
 			}
-		case global_constant.Entities.Item:
+		case global_constant.ENTITY_ITEM:
 			{
 				item, _ := itemRepository.GetByID(context.TODO(), event.EntityId)
 				docmentToCreate = item.ToDocument()
 			}
-		case global_constant.Entities.Payment:
+		case global_constant.ENTITY_PAYMENT:
 			{
 				payment, _ := paymentRepository.GetByID(context.TODO(), event.EntityId)
 				docmentToCreate = payment.ToDocument()
@@ -76,15 +76,15 @@ func StartCRUDWorker() {
 
 		switch event.OperationType {
 
-		case global_constant.Operations.Create:
+		case global_constant.OPERATION_CREATE:
 			{
 				entityGnosql.Create(docmentToCreate)
 			}
-		case global_constant.Operations.Update:
+		case global_constant.OPERATION_UPDATE:
 			{
 				entityGnosql.Update(event.EntityId, docmentToCreate)
 			}
-		case global_constant.Operations.Delete:
+		case global_constant.OPERATION_DELETE:
 			{
 				entityGnosql.Delete(event.EntityId)
 			}

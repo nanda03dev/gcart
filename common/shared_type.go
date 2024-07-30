@@ -33,3 +33,13 @@ type GnoSQLCollectionSchemaType struct {
 	CollectionName string
 	IndexKeys      []string
 }
+
+type SuccessResponse struct {
+	Data any `json:"data"`
+	Msg  any `json:"msg"`
+}
+
+type ErrorResponse struct {
+	Msg   any `json:"msg"`
+	Error any `json:"error"`
+}

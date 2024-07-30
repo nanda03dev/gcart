@@ -17,6 +17,14 @@ var CityGnosql = gnosql_client.CollectionInput{
 	IndexKeys:      []string{"countryCode"},
 }
 
+func (city City) ToModel(cityDocument gnosql_client.Document) City {
+	return City{
+		DocId:       common.GetStringValue(cityDocument, "docId"),
+		Name:        common.GetStringValue(cityDocument, "name"),
+		CountryCode: common.GetStringValue(cityDocument, "countryCode"),
+	}
+}
+
 func (city City) ToDocument() gnosql_client.Document {
 	return gnosql_client.Document{
 		"docId":       city.DocId,
@@ -31,4 +39,17 @@ func (city City) ToEvent(operationType common.OperationType) common.EventType {
 		EntityType:    global_constant.ENTITY_CITY,
 		OperationType: operationType,
 	}
+}
+
+func (city City) ToUpdatedDocument(newCity City) City {
+	cityDocument := city.ToDocument()
+	newCityDocument := newCity.ToDocument()
+
+	for key, value := range newCityDocument {
+		if value != nil && value != "" {
+			cityDocument[key] = value
+		}
+	}
+
+	return city.ToModel(cityDocument)
 }

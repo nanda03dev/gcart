@@ -31,6 +31,8 @@ func GetGnosqlCollection(entityType common.EntityNameType) gnosql_client.Collect
 	switch entityType {
 	case global_constant.ENTITY_CITY:
 		return models.CityGnosql
+	case global_constant.ENTITY_USER:
+		return models.UserGnosql
 	case global_constant.ENTITY_PRODUCT:
 		return models.ProductGnosql
 	case global_constant.ENTITY_ORDER:
@@ -39,7 +41,41 @@ func GetGnosqlCollection(entityType common.EntityNameType) gnosql_client.Collect
 		return models.ItemGnosql
 	case global_constant.ENTITY_PAYMENT:
 		return models.PaymentGnosql
+
 	default:
 		return gnosql_client.CollectionInput{}
 	}
+}
+
+func IsRequireToStoreEvent(entityType common.EntityNameType) bool {
+	switch entityType {
+	case global_constant.ENTITY_CITY,
+		global_constant.ENTITY_USER,
+		global_constant.ENTITY_PRODUCT,
+		global_constant.ENTITY_ITEM:
+		return false
+	case global_constant.ENTITY_ORDER,
+		global_constant.ENTITY_PAYMENT:
+		return true
+	default:
+		return false
+	}
+}
+
+func IsEventTimeExpired(entityType common.EntityNameType, eventCreatedAt time.Time) bool {
+	var expireTime time.Time
+
+	switch entityType {
+	case global_constant.ENTITY_CITY,
+		global_constant.ENTITY_USER,
+		global_constant.ENTITY_PRODUCT,
+		global_constant.ENTITY_ITEM:
+		return false
+	case global_constant.ENTITY_ORDER:
+		expireTime = eventCreatedAt.Add(30 * time.Second)
+	case global_constant.ENTITY_PAYMENT:
+		expireTime = eventCreatedAt.Add(30 * time.Second)
+	}
+
+	return time.Now().After(expireTime)
 }

@@ -5,36 +5,31 @@ import (
 	"time"
 
 	"github.com/nanda03dev/gnosql_client"
-	"github.com/nanda03dev/go2ms/common"
+	"github.com/nanda03dev/go2ms/channels"
 	"github.com/nanda03dev/go2ms/config"
 	"github.com/nanda03dev/go2ms/global_constant"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
+	"github.com/nanda03dev/go2ms/services"
 	"github.com/nanda03dev/go2ms/utils"
 )
 
-var chanCRUD = make(chan common.EventType)
-
-func AddToChanCRUD(event common.EventType) {
-	chanCRUD <- event
-}
-
 func StartCRUDWorker() {
 	for {
-		crudEvent := <-chanCRUD
-		var cityRepository = repositories.AppRepositories.City
-		var userRepository = repositories.AppRepositories.User
-		var productRepository = repositories.AppRepositories.Product
+		crudEvent := <-channels.ChannelCRUD
 
-		var orderRepository = repositories.AppRepositories.Order
-		var itemRepository = repositories.AppRepositories.Item
-		var paymentRepository = repositories.AppRepositories.Payment
+		var cityService = services.AppServices.City
+		var userService = services.AppServices.User
+		var productService = services.AppServices.Product
+		var orderService = services.AppServices.Order
+		var itemService = services.AppServices.Item
+		var paymentService = services.AppServices.Payment
 
 		event := models.Event{
 			EntityId:      crudEvent.EntityId,
 			EntityType:    crudEvent.EntityType,
 			OperationType: crudEvent.OperationType,
-			ExpireTime:    time.Now().Add(1 * time.Minute),
+			CreatedAt:     time.Now(),
 		}
 
 		collectionName := utils.GetGnosqlCollection(crudEvent.EntityType).CollectionName
@@ -44,32 +39,32 @@ func StartCRUDWorker() {
 		switch event.EntityType {
 		case global_constant.ENTITY_CITY:
 			{
-				city, _ := cityRepository.GetByID(context.TODO(), event.EntityId)
+				city, _ := cityService.GetCityByID(event.EntityId)
 				docmentToCreate = city.ToDocument()
 			}
 		case global_constant.ENTITY_USER:
 			{
-				user, _ := userRepository.GetByID(context.TODO(), event.EntityId)
+				user, _ := userService.GetUserByID(event.EntityId)
 				docmentToCreate = user.ToDocument()
 			}
 		case global_constant.ENTITY_PRODUCT:
 			{
-				product, _ := productRepository.GetByID(context.TODO(), event.EntityId)
+				product, _ := productService.GetProductByID(event.EntityId)
 				docmentToCreate = product.ToDocument()
 			}
 		case global_constant.ENTITY_ORDER:
 			{
-				order, _ := orderRepository.GetByID(context.TODO(), event.EntityId)
+				order, _ := orderService.GetOrderByID(event.EntityId)
 				docmentToCreate = order.ToDocument()
 			}
 		case global_constant.ENTITY_ITEM:
 			{
-				item, _ := itemRepository.GetByID(context.TODO(), event.EntityId)
+				item, _ := itemService.GetItemByID(event.EntityId)
 				docmentToCreate = item.ToDocument()
 			}
 		case global_constant.ENTITY_PAYMENT:
 			{
-				payment, _ := paymentRepository.GetByID(context.TODO(), event.EntityId)
+				payment, _ := paymentService.GetPaymentByID(event.EntityId)
 				docmentToCreate = payment.ToDocument()
 			}
 		}
@@ -90,6 +85,8 @@ func StartCRUDWorker() {
 			}
 		}
 
-		repositories.AppRepositories.Event.Create(context.TODO(), event)
+		if utils.IsRequireToStoreEvent(event.EntityType) {
+			repositories.AppRepositories.Event.Create(context.TODO(), event)
+		}
 	}
 }

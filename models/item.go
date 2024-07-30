@@ -7,10 +7,11 @@ import (
 )
 
 type Item struct {
-	DocId  string `json:"docId" bson:"docId"`
-	Name   string `json:"name" bson:"name"`
-	Amount int    `json:"amount" bson:"amount"`
-	Status bool   `bson:"status"`
+	DocId      string            `json:"docId" bson:"docId"`
+	OrderId    string            `json:"orderId" bson:"orderId"`
+	Name       string            `json:"name" bson:"name"`
+	Amount     int               `json:"amount" bson:"amount"`
+	StatusCode common.StatusCode `json:"statusCode" bson:"statusCode"`
 }
 
 var ItemGnosql = gnosql_client.CollectionInput{
@@ -18,12 +19,23 @@ var ItemGnosql = gnosql_client.CollectionInput{
 	IndexKeys:      []string{},
 }
 
+func (item Item) ToModel(itemDocument gnosql_client.Document) Item {
+	return Item{
+		DocId:      common.GetStringValue(itemDocument, "docId"),
+		OrderId:    common.GetStringValue(itemDocument, "orderId"),
+		Name:       common.GetStringValue(itemDocument, "name"),
+		Amount:     common.GetIntegerValue(itemDocument, "amount"),
+		StatusCode: common.GetValue[common.StatusCode](itemDocument, "statusCode"),
+	}
+}
+
 func (item Item) ToDocument() gnosql_client.Document {
 	return gnosql_client.Document{
-		"docId":  item.DocId,
-		"name":   item.Name,
-		"amount": item.Amount,
-		"status": item.Status,
+		"docId":      item.DocId,
+		"orderId":    item.OrderId,
+		"name":       item.Name,
+		"amount":     item.Amount,
+		"statusCode": item.StatusCode,
 	}
 }
 
@@ -33,4 +45,20 @@ func (item Item) ToEvent(operationType common.OperationType) common.EventType {
 		EntityType:    global_constant.ENTITY_ITEM,
 		OperationType: operationType,
 	}
+}
+
+func (item Item) ToUpdatedDocument(newItem Item) Item {
+	itemDocument := item.ToDocument()
+	newItemDocument := newItem.ToDocument()
+
+	// statusCode should not be updated
+	newItemDocument["statusCode"] = itemDocument["statusCode"]
+
+	for key, value := range newItemDocument {
+		if value != nil && value != "" {
+			itemDocument[key] = value
+		}
+	}
+
+	return item.ToModel(itemDocument)
 }

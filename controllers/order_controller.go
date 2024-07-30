@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/nanda03dev/go2ms/common"
+	"github.com/nanda03dev/go2ms/global_constant"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/services"
 )
@@ -20,32 +21,33 @@ func NewOrderController(orderService services.OrderService) *OrderController {
 func (c *OrderController) CreateOrder(ctx *gin.Context) {
 	var order models.Order
 	if err := ctx.ShouldBindJSON(&order); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
 	order, err := c.orderService.CreateOrder(order)
 
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, order)
+	ctx.JSON(http.StatusCreated, ToSuccessResponse(global_constant.DATA_CREATED_SUCCESSFULLY, order.DocId))
 }
 
 func (c *OrderController) GetAllOrders(ctx *gin.Context) {
 	var requestFilterBody common.RequestFilterBodyType
 	if err := ctx.ShouldBindJSON(&requestFilterBody); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
 
 	orders, err := c.orderService.GetAllOrders(requestFilterBody)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.JSON(http.StatusOK, orders)
+	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.DATA_FETCHED_SUCCESSFULLY, orders))
+
 }
 
 func (c *OrderController) GetOrderByID(ctx *gin.Context) {
@@ -53,34 +55,34 @@ func (c *OrderController) GetOrderByID(ctx *gin.Context) {
 
 	order, err := c.orderService.GetOrderByID(idParam)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.JSON(http.StatusOK, order)
+	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.DATA_FETCHED_SUCCESSFULLY, order))
 }
 
 func (c *OrderController) UpdateOrder(ctx *gin.Context) {
 	var order models.Order
 	if err := ctx.ShouldBindJSON(&order); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
 
 	order.DocId = ctx.Param("id")
 
 	if err := c.orderService.UpdateOrder(order); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.JSON(http.StatusOK, order)
+	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.DATA_UPDATED_SUCCESSFULLY, nil))
 }
 
 func (c *OrderController) DeleteOrder(ctx *gin.Context) {
 	idParam := ctx.Param("id")
 
 	if err := c.orderService.DeleteOrder(idParam); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.DATA_DELETED_SUCCESSFULLY, nil))
 }

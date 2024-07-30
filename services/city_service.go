@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 
+	"github.com/nanda03dev/go2ms/channels"
 	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/global_constant"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
 	"github.com/nanda03dev/go2ms/utils"
-	"github.com/nanda03dev/go2ms/workers"
 )
 
 type CityService interface {
@@ -33,7 +33,7 @@ func (s *cityService) CreateCity(city models.City) (models.City, error) {
 	createError := s.cityRepository.Create(context.Background(), city)
 
 	event := city.ToEvent(global_constant.OPERATION_CREATE)
-	workers.AddToChanCRUD(event)
+	channels.AddToChanCRUD(event)
 
 	return city, createError
 }
@@ -46,12 +46,17 @@ func (s *cityService) GetCityByID(docId string) (models.City, error) {
 	return s.cityRepository.GetByID(context.Background(), docId)
 }
 
-func (s *cityService) UpdateCity(city models.City) error {
+func (s *cityService) UpdateCity(updateCity models.City) error {
+	city, getByIdError := s.cityRepository.GetByID(context.Background(), updateCity.DocId)
 
-	updateError := s.cityRepository.Update(context.Background(), city.DocId, city)
+	if getByIdError != nil {
+		return errors.New(global_constant.ENTITY_NOT_FOUND)
+	}
+
+	updateError := s.cityRepository.Update(context.Background(), city.DocId, city.ToUpdatedDocument(updateCity))
 
 	event := city.ToEvent(global_constant.OPERATION_UPDATE)
-	workers.AddToChanCRUD(event)
+	channels.AddToChanCRUD(event)
 
 	return updateError
 }
@@ -60,12 +65,12 @@ func (s *cityService) DeleteCity(docId string) error {
 	city, getByIdError := s.cityRepository.GetByID(context.Background(), docId)
 
 	if getByIdError != nil {
-		return errors.New("entity not found")
+		return errors.New(global_constant.ENTITY_NOT_FOUND)
 	}
 	deleteError := s.cityRepository.Delete(context.Background(), docId)
 
 	event := city.ToEvent(global_constant.OPERATION_DELETE)
-	workers.AddToChanCRUD(event)
+	channels.AddToChanCRUD(event)
 
 	return deleteError
 }

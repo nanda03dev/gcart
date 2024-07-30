@@ -29,10 +29,33 @@ func (user User) ToDocument() gnosql_client.Document {
 	}
 }
 
+func (user User) ToModel(userDocument gnosql_client.Document) User {
+	return User{
+		DocId:   common.GetStringValue(userDocument, "docId"),
+		Name:    common.GetStringValue(userDocument, "name"),
+		Email:   common.GetStringValue(userDocument, "email"),
+		Address: common.GetStringValue(userDocument, "address"),
+		CityID:  common.GetStringValue(userDocument, "cityId"),
+	}
+}
+
 func (user User) ToEvent(operationType common.OperationType) common.EventType {
 	return common.EventType{
 		EntityId:      user.DocId,
 		EntityType:    global_constant.ENTITY_USER,
 		OperationType: operationType,
 	}
+}
+
+func (user User) ToUpdatedDocument(newUser User) User {
+	userDocument := user.ToDocument()
+	newUserDocument := newUser.ToDocument()
+
+	for key, value := range newUserDocument {
+		if value != nil && value != "" {
+			userDocument[key] = value
+		}
+	}
+
+	return user.ToModel(userDocument)
 }

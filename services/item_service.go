@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 
+	"github.com/nanda03dev/go2ms/channels"
 	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/global_constant"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
 	"github.com/nanda03dev/go2ms/utils"
-	"github.com/nanda03dev/go2ms/workers"
 )
 
 type ItemService interface {
@@ -17,6 +17,7 @@ type ItemService interface {
 	GetAllItems(requestFilterBody common.RequestFilterBodyType) ([]models.Item, error)
 	GetItemByID(docId string) (models.Item, error)
 	UpdateItem(item models.Item) error
+	UpdateItemsTimeout(requestFilterBody common.FiltersBodyType) error
 	DeleteItem(docId string) error
 }
 
@@ -30,10 +31,11 @@ func NewItemService(itemRepository *repositories.ItemRepository) ItemService {
 
 func (s *itemService) CreateItem(item models.Item) (models.Item, error) {
 	item.DocId = utils.Generate16DigitUUID()
+	item.StatusCode = global_constant.ITEM_INITIATED
 	createError := s.itemRepository.Create(context.Background(), item)
 
 	event := item.ToEvent(global_constant.OPERATION_CREATE)
-	workers.AddToChanCRUD(event)
+	channels.AddToChanCRUD(event)
 
 	return item, createError
 }
@@ -46,25 +48,48 @@ func (s *itemService) GetItemByID(docId string) (models.Item, error) {
 	return s.itemRepository.GetByID(context.Background(), docId)
 }
 
-func (s *itemService) UpdateItem(item models.Item) error {
-	updateError := s.itemRepository.Update(context.Background(), item.DocId, item)
+func (s *itemService) UpdateItem(updateItem models.Item) error {
+	item, getByIdError := s.itemRepository.GetByID(context.Background(), updateItem.DocId)
+
+	if getByIdError != nil {
+		return errors.New(global_constant.ENTITY_NOT_FOUND)
+	}
+
+	updateError := s.itemRepository.Update(context.Background(), item.DocId, item.ToUpdatedDocument(updateItem))
 
 	event := item.ToEvent(global_constant.OPERATION_UPDATE)
-	workers.AddToChanCRUD(event)
+	channels.AddToChanCRUD(event)
 
 	return updateError
+}
+
+func (s *itemService) UpdateItemsTimeout(filter common.FiltersBodyType) error {
+	items, _ := s.itemRepository.GetAll(context.Background(), filter, nil, nil)
+
+	updateDocument := map[string]interface{}{
+		"statusCode": global_constant.ITEM_TIMEOUT,
+	}
+
+	updateManyError := s.itemRepository.UpdateMany(context.TODO(), filter, updateDocument)
+
+	for _, item := range items {
+		event := item.ToEvent(global_constant.OPERATION_UPDATE)
+		channels.AddToChanCRUD(event)
+
+	}
+	return updateManyError
 }
 
 func (s *itemService) DeleteItem(docId string) error {
 	item, getByIdError := s.itemRepository.GetByID(context.Background(), docId)
 
 	if getByIdError != nil {
-		return errors.New("entity not found")
+		return errors.New(global_constant.ENTITY_NOT_FOUND)
 	}
 	deleteError := s.itemRepository.Delete(context.Background(), docId)
 
 	event := item.ToEvent(global_constant.OPERATION_DELETE)
-	workers.AddToChanCRUD(event)
+	channels.AddToChanCRUD(event)
 
 	return deleteError
 }

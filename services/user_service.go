@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 
+	"github.com/nanda03dev/go2ms/channels"
 	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/global_constant"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
 	"github.com/nanda03dev/go2ms/utils"
-	"github.com/nanda03dev/go2ms/workers"
 )
 
 type UserService interface {
@@ -33,7 +33,7 @@ func (s *userService) CreateUser(user models.User) (models.User, error) {
 	createError := s.userRepository.Create(context.Background(), user)
 
 	event := user.ToEvent(global_constant.OPERATION_CREATE)
-	workers.AddToChanCRUD(event)
+	channels.AddToChanCRUD(event)
 
 	return user, createError
 }
@@ -46,11 +46,17 @@ func (s *userService) GetUserByID(docId string) (models.User, error) {
 	return s.userRepository.GetByID(context.Background(), docId)
 }
 
-func (s *userService) UpdateUser(user models.User) error {
-	updateError := s.userRepository.Update(context.Background(), user.DocId, user)
+func (s *userService) UpdateUser(updateUser models.User) error {
+	user, getByIdError := s.userRepository.GetByID(context.Background(), updateUser.DocId)
+
+	if getByIdError != nil {
+		return errors.New(global_constant.ENTITY_NOT_FOUND)
+	}
+
+	updateError := s.userRepository.Update(context.Background(), user.DocId, user.ToUpdatedDocument(updateUser))
 
 	event := user.ToEvent(global_constant.OPERATION_UPDATE)
-	workers.AddToChanCRUD(event)
+	channels.AddToChanCRUD(event)
 
 	return updateError
 }
@@ -59,12 +65,12 @@ func (s *userService) DeleteUser(docId string) error {
 	user, getByIdError := s.userRepository.GetByID(context.Background(), docId)
 
 	if getByIdError != nil {
-		return errors.New("entity not found")
+		return errors.New(global_constant.ENTITY_NOT_FOUND)
 	}
 	deleteError := s.userRepository.Delete(context.Background(), docId)
 
 	event := user.ToEvent(global_constant.OPERATION_DELETE)
-	workers.AddToChanCRUD(event)
+	channels.AddToChanCRUD(event)
 
 	return deleteError
 }

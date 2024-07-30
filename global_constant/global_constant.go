@@ -21,11 +21,25 @@ const (
 )
 
 const (
-	// Order status code
+	// Order status statusCode
 	ORDER_INITIATED common.StatusCode = "3201"
 	ORDER_TIMEOUT   common.StatusCode = "3408"
 
-	// Payment status code
+	// Order status statusCode
+	ITEM_INITIATED common.StatusCode = "4201"
+	ITEM_TIMEOUT   common.StatusCode = "4408"
+
+	// Payment status statusCode
 	PAYMENT_INITIATED common.StatusCode = "5201"
 	PAYMENT_TIMEOUT   common.StatusCode = "5408"
+)
+
+const (
+	DATA_CREATED_SUCCESSFULLY            = "DATA_CREATED_SUCCESSFULLY"
+	DATA_FETCHED_SUCCESSFULLY            = "DATA_FETCHED_SUCCESSFULLY"
+	DATA_UPDATED_SUCCESSFULLY            = "DATA_UPDATED_SUCCESSFULLY"
+	DATA_DELETED_SUCCESSFULLY            = "DATA_DELETED_SUCCESSFULLY"
+	ERROR_WHILE_PROCESSING               = "ERROR_WHILE_PROCESSING"
+	ENTITY_NOT_FOUND                     = "ENTITY_NOT_FOUND"
+	ENTITY_ALREADY_COMPLETED_OR_TIMEDOUT = "ENTITY_ALREADY_COMPLETED_OR_TIMEDOUT"
 )

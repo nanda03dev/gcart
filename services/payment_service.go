@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 
+	"github.com/nanda03dev/go2ms/channels"
 	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/global_constant"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
 	"github.com/nanda03dev/go2ms/utils"
-	"github.com/nanda03dev/go2ms/workers"
 )
 
 type PaymentService interface {
@@ -17,6 +17,7 @@ type PaymentService interface {
 	GetAllPayments(requestFilterBody common.RequestFilterBodyType) ([]models.Payment, error)
 	GetPaymentByID(docId string) (models.Payment, error)
 	UpdatePayment(payment models.Payment) error
+	UpdatePaymentTimeout(docId string) bool
 	DeletePayment(docId string) error
 }
 
@@ -30,11 +31,11 @@ func NewPaymentService(paymentRepository *repositories.PaymentRepository) Paymen
 
 func (s *paymentService) CreatePayment(payment models.Payment) (models.Payment, error) {
 	payment.DocId = utils.Generate16DigitUUID()
-	payment.Code = global_constant.PAYMENT_INITIATED
+	payment.StatusCode = global_constant.PAYMENT_INITIATED
 	createError := s.paymentRepository.Create(context.Background(), payment)
 
 	event := payment.ToEvent(global_constant.OPERATION_CREATE)
-	workers.AddToChanCRUD(event)
+	channels.AddToChanCRUD(event)
 
 	return payment, createError
 }
@@ -47,25 +48,43 @@ func (s *paymentService) GetPaymentByID(docId string) (models.Payment, error) {
 	return s.paymentRepository.GetByID(context.Background(), docId)
 }
 
-func (s *paymentService) UpdatePayment(payment models.Payment) error {
-	updateError := s.paymentRepository.Update(context.Background(), payment.DocId, payment)
+func (s *paymentService) UpdatePayment(updatePayment models.Payment) error {
+	payment, getByIdError := s.paymentRepository.GetByID(context.Background(), updatePayment.DocId)
+
+	if getByIdError != nil {
+		return errors.New(global_constant.ENTITY_NOT_FOUND)
+	}
+
+	updateError := s.paymentRepository.Update(context.Background(), payment.DocId, payment.ToUpdatedDocument(updatePayment))
 
 	event := payment.ToEvent(global_constant.OPERATION_UPDATE)
-	workers.AddToChanCRUD(event)
+	channels.AddToChanCRUD(event)
 
 	return updateError
+}
+
+func (s *paymentService) UpdatePaymentTimeout(docId string) bool {
+	payment, _ := s.paymentRepository.GetByID(context.TODO(), docId)
+
+	if payment.StatusCode == global_constant.PAYMENT_INITIATED {
+		payment.StatusCode = global_constant.PAYMENT_TIMEOUT
+		s.paymentRepository.Update(context.TODO(), payment.DocId, payment)
+		return true
+	}
+
+	return false
 }
 
 func (s *paymentService) DeletePayment(docId string) error {
 	payment, getByIdError := s.paymentRepository.GetByID(context.Background(), docId)
 
 	if getByIdError != nil {
-		return errors.New("entity not found")
+		return errors.New(global_constant.ENTITY_NOT_FOUND)
 	}
 	deleteError := s.paymentRepository.Delete(context.Background(), docId)
 
 	event := payment.ToEvent(global_constant.OPERATION_DELETE)
-	workers.AddToChanCRUD(event)
+	channels.AddToChanCRUD(event)
 
 	return deleteError
 }

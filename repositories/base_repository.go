@@ -29,7 +29,7 @@ func convertKeyLower(key string) string {
 	return strings.ToLower(string(key[0])) + key[1:]
 }
 
-func (r *BaseRepository[T]) GetAll(ctx context.Context, filters common.FiltersBodyType, sort interface{}, limit interface{}) ([]T, error) {
+func convertFilterQuery(filters common.FiltersBodyType) bson.D {
 	filter := bson.D{}
 	if filters == nil {
 		filter = bson.D{}
@@ -38,6 +38,10 @@ func (r *BaseRepository[T]) GetAll(ctx context.Context, filters common.FiltersBo
 	for _, f := range filters {
 		filter = append(filter, bson.E{Key: convertKeyLower(f.Key), Value: f.Value})
 	}
+	return filter
+}
+func (r *BaseRepository[T]) GetAll(ctx context.Context, filters common.FiltersBodyType, sort interface{}, limit interface{}) ([]T, error) {
+	filterQuery := convertFilterQuery(filters)
 
 	// Prepare options
 	findOptions := options.Find()
@@ -75,7 +79,7 @@ func (r *BaseRepository[T]) GetAll(ctx context.Context, filters common.FiltersBo
 		}
 	}
 
-	cursor, err := r.collection.Find(ctx, filter, findOptions)
+	cursor, err := r.collection.Find(ctx, filterQuery, findOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +109,28 @@ func (r *BaseRepository[T]) Update(ctx context.Context, id string, update T) err
 	return err
 }
 
+func (r *BaseRepository[T]) BulkInsert(ctx context.Context, documents []T) error {
+	// Convert []T to []interface{} for InsertMany
+	interfaceDocs := make([]interface{}, len(documents))
+	for i, v := range documents {
+		interfaceDocs[i] = v
+	}
+
+	_, err := r.collection.InsertMany(ctx, interfaceDocs)
+	return err
+}
+
+func (r *BaseRepository[T]) UpdateMany(ctx context.Context, filters common.FiltersBodyType, update interface{}) error {
+	_, err := r.collection.UpdateMany(ctx, convertFilterQuery(filters), bson.M{"$set": update})
+	return err
+}
+
 func (r *BaseRepository[T]) Delete(ctx context.Context, id string) error {
 	_, err := r.collection.DeleteOne(ctx, bson.M{"docId": id})
+	return err
+}
+
+func (r *BaseRepository[T]) DeleteMany(ctx context.Context, filters common.FiltersBodyType) error {
+	_, err := r.collection.DeleteMany(ctx, convertFilterQuery(filters))
 	return err
 }

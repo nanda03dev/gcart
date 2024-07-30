@@ -7,42 +7,44 @@ import (
 	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/global_constant"
 	"github.com/nanda03dev/go2ms/repositories"
+	"github.com/nanda03dev/go2ms/services"
+	"github.com/nanda03dev/go2ms/utils"
 )
 
 func StartEntityTimeoutWorker() {
-	var orderRepository = repositories.AppRepositories.Order
-	var paymentRepository = repositories.AppRepositories.Payment
 	var eventRepository = repositories.AppRepositories.Event
 
-	for {
+	var orderService = services.AppServices.Order
+	var itemService = services.AppServices.Item
+	var paymentService = services.AppServices.Payment
+	var eventService = services.AppServices.Event
 
-		events, _ := eventRepository.GetAll(context.TODO(), nil, common.SortBodyType{Key: "ExpireTime", Order: 1}, nil)
+	for {
+		eventLimit := 100
+
+		events, _ := eventRepository.GetAll(context.TODO(), nil, common.SortBodyType{Key: "createdAt", Order: 1}, eventLimit)
 
 		for _, event := range events {
 
-			if time.Now().Before(event.ExpireTime) {
+			if !utils.IsEventTimeExpired(event.EntityType, event.CreatedAt) {
 				continue
 			}
 
 			if event.EntityType == global_constant.ENTITY_ORDER {
-				order, _ := orderRepository.GetByID(context.TODO(), event.EntityId)
-
-				if order.Code == global_constant.ORDER_INITIATED {
-					order.Code = global_constant.ORDER_TIMEOUT
-					orderRepository.Update(context.TODO(), order.DocId, order)
-					eventRepository.Delete(context.TODO(), event.DocId)
+				isOrderTimedout := orderService.UpdateOrderTimeout(event.EntityId)
+				if isOrderTimedout {
+					orderIdFilter := common.FiltersBodyType{
+						{Key: "orderId", Value: event.EntityId},
+					}
+					itemService.UpdateItemsTimeout(orderIdFilter)
 				}
 			}
+
 			if event.EntityType == global_constant.ENTITY_PAYMENT {
-				payment, _ := paymentRepository.GetByID(context.TODO(), event.EntityId)
-
-				if payment.Code == global_constant.PAYMENT_INITIATED {
-					payment.Code = global_constant.PAYMENT_TIMEOUT
-					paymentRepository.Update(context.TODO(), payment.DocId, payment)
-					eventRepository.Delete(context.TODO(), event.DocId)
-				}
+				paymentService.UpdatePaymentTimeout(event.EntityId)
 			}
 
+			eventService.DeleteEvent(event.DocId)
 		}
 
 		time.Sleep(time.Second * 10)

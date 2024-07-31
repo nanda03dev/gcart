@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/nanda03dev/go2ms/channels"
 	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/global_constant"
 	"github.com/nanda03dev/go2ms/models"
@@ -33,7 +32,7 @@ func (s *cityService) CreateCity(city models.City) (models.City, error) {
 	createError := s.cityRepository.Create(context.Background(), city)
 
 	event := city.ToEvent(global_constant.OPERATION_CREATE)
-	channels.AddToChanCRUD(event)
+	common.AddToChanCRUD(event)
 
 	return city, createError
 }
@@ -56,7 +55,7 @@ func (s *cityService) UpdateCity(updateCity models.City) error {
 	updateError := s.cityRepository.Update(context.Background(), city.DocId, city.ToUpdatedDocument(updateCity))
 
 	event := city.ToEvent(global_constant.OPERATION_UPDATE)
-	channels.AddToChanCRUD(event)
+	common.AddToChanCRUD(event)
 
 	return updateError
 }
@@ -70,7 +69,7 @@ func (s *cityService) DeleteCity(docId string) error {
 	deleteError := s.cityRepository.Delete(context.Background(), docId)
 
 	event := city.ToEvent(global_constant.OPERATION_DELETE)
-	channels.AddToChanCRUD(event)
+	common.AddToChanCRUD(event)
 
 	return deleteError
 }

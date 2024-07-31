@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/nanda03dev/go2ms/channels"
 	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/global_constant"
 	"github.com/nanda03dev/go2ms/models"
@@ -33,7 +32,7 @@ func (s *userService) CreateUser(user models.User) (models.User, error) {
 	createError := s.userRepository.Create(context.Background(), user)
 
 	event := user.ToEvent(global_constant.OPERATION_CREATE)
-	channels.AddToChanCRUD(event)
+	common.AddToChanCRUD(event)
 
 	return user, createError
 }
@@ -56,7 +55,7 @@ func (s *userService) UpdateUser(updateUser models.User) error {
 	updateError := s.userRepository.Update(context.Background(), user.DocId, user.ToUpdatedDocument(updateUser))
 
 	event := user.ToEvent(global_constant.OPERATION_UPDATE)
-	channels.AddToChanCRUD(event)
+	common.AddToChanCRUD(event)
 
 	return updateError
 }
@@ -70,7 +69,7 @@ func (s *userService) DeleteUser(docId string) error {
 	deleteError := s.userRepository.Delete(context.Background(), docId)
 
 	event := user.ToEvent(global_constant.OPERATION_DELETE)
-	channels.AddToChanCRUD(event)
+	common.AddToChanCRUD(event)
 
 	return deleteError
 }

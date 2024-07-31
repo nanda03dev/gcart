@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/nanda03dev/go2ms/channels"
 	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/global_constant"
 	"github.com/nanda03dev/go2ms/models"
@@ -35,7 +34,7 @@ func (s *paymentService) CreatePayment(payment models.Payment) (models.Payment, 
 	createError := s.paymentRepository.Create(context.Background(), payment)
 
 	event := payment.ToEvent(global_constant.OPERATION_CREATE)
-	channels.AddToChanCRUD(event)
+	common.AddToChanCRUD(event)
 
 	return payment, createError
 }
@@ -58,7 +57,7 @@ func (s *paymentService) UpdatePayment(updatePayment models.Payment) error {
 	updateError := s.paymentRepository.Update(context.Background(), payment.DocId, payment.ToUpdatedDocument(updatePayment))
 
 	event := payment.ToEvent(global_constant.OPERATION_UPDATE)
-	channels.AddToChanCRUD(event)
+	common.AddToChanCRUD(event)
 
 	return updateError
 }
@@ -84,7 +83,7 @@ func (s *paymentService) DeletePayment(docId string) error {
 	deleteError := s.paymentRepository.Delete(context.Background(), docId)
 
 	event := payment.ToEvent(global_constant.OPERATION_DELETE)
-	channels.AddToChanCRUD(event)
+	common.AddToChanCRUD(event)
 
 	return deleteError
 }

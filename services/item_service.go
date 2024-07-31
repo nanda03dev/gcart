@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/nanda03dev/go2ms/channels"
 	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/global_constant"
 	"github.com/nanda03dev/go2ms/models"
@@ -35,7 +34,7 @@ func (s *itemService) CreateItem(item models.Item) (models.Item, error) {
 	createError := s.itemRepository.Create(context.Background(), item)
 
 	event := item.ToEvent(global_constant.OPERATION_CREATE)
-	channels.AddToChanCRUD(event)
+	common.AddToChanCRUD(event)
 
 	return item, createError
 }
@@ -58,7 +57,7 @@ func (s *itemService) UpdateItem(updateItem models.Item) error {
 	updateError := s.itemRepository.Update(context.Background(), item.DocId, item.ToUpdatedDocument(updateItem))
 
 	event := item.ToEvent(global_constant.OPERATION_UPDATE)
-	channels.AddToChanCRUD(event)
+	common.AddToChanCRUD(event)
 
 	return updateError
 }
@@ -74,7 +73,7 @@ func (s *itemService) UpdateItemsTimeout(filter common.FiltersBodyType) error {
 
 	for _, item := range items {
 		event := item.ToEvent(global_constant.OPERATION_UPDATE)
-		channels.AddToChanCRUD(event)
+		common.AddToChanCRUD(event)
 
 	}
 	return updateManyError
@@ -89,7 +88,7 @@ func (s *itemService) DeleteItem(docId string) error {
 	deleteError := s.itemRepository.Delete(context.Background(), docId)
 
 	event := item.ToEvent(global_constant.OPERATION_DELETE)
-	channels.AddToChanCRUD(event)
+	common.AddToChanCRUD(event)
 
 	return deleteError
 }

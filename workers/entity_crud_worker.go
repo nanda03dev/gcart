@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/nanda03dev/gnosql_client"
-	"github.com/nanda03dev/go2ms/channels"
+	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/config"
 	"github.com/nanda03dev/go2ms/global_constant"
 	"github.com/nanda03dev/go2ms/models"
@@ -16,7 +16,7 @@ import (
 
 func StartCRUDWorker() {
 	for {
-		crudEvent := <-channels.ChannelCRUD
+		crudEvent := <-common.ChannelCRUD
 
 		var cityService = services.AppServices.City
 		var userService = services.AppServices.User

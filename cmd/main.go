@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/config"
 	"github.com/nanda03dev/go2ms/repositories"
 	"github.com/nanda03dev/go2ms/routes"
@@ -13,6 +14,8 @@ import (
 
 func main() {
 	config.LoadConfig()
+
+	common.InitializeChannels()
 
 	database := config.SetupDatabase()
 

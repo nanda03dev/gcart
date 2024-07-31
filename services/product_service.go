@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/nanda03dev/go2ms/channels"
 	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/global_constant"
 	"github.com/nanda03dev/go2ms/models"
@@ -33,7 +32,7 @@ func (s *productService) CreateProduct(product models.Product) (models.Product, 
 	createError := s.productRepository.Create(context.Background(), product)
 
 	event := product.ToEvent(global_constant.OPERATION_CREATE)
-	channels.AddToChanCRUD(event)
+	common.AddToChanCRUD(event)
 
 	return product, createError
 }
@@ -56,7 +55,7 @@ func (s *productService) UpdateProduct(updateProduct models.Product) error {
 	updateError := s.productRepository.Update(context.Background(), product.DocId, product.ToUpdatedDocument(updateProduct))
 
 	event := product.ToEvent(global_constant.OPERATION_UPDATE)
-	channels.AddToChanCRUD(event)
+	common.AddToChanCRUD(event)
 
 	return updateError
 }
@@ -70,7 +69,7 @@ func (s *productService) DeleteProduct(docId string) error {
 	deleteError := s.productRepository.Delete(context.Background(), docId)
 
 	event := product.ToEvent(global_constant.OPERATION_DELETE)
-	channels.AddToChanCRUD(event)
+	common.AddToChanCRUD(event)
 
 	return deleteError
 }

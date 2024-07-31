@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/nanda03dev/go2ms/channels"
 	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/global_constant"
 	"github.com/nanda03dev/go2ms/models"
@@ -35,7 +34,7 @@ func (s *orderService) CreateOrder(order models.Order) (models.Order, error) {
 	createError := s.orderRepository.Create(context.Background(), order)
 
 	event := order.ToEvent(global_constant.OPERATION_CREATE)
-	channels.AddToChanCRUD(event)
+	common.AddToChanCRUD(event)
 
 	return order, createError
 }
@@ -58,7 +57,7 @@ func (s *orderService) UpdateOrder(updateOrder models.Order) error {
 	updateError := s.orderRepository.Update(context.Background(), order.DocId, order.ToUpdatedDocument(updateOrder))
 
 	event := order.ToEvent(global_constant.OPERATION_UPDATE)
-	channels.AddToChanCRUD(event)
+	common.AddToChanCRUD(event)
 
 	return updateError
 }
@@ -69,6 +68,9 @@ func (s *orderService) UpdateOrderTimeout(docId string) bool {
 	if order.StatusCode == global_constant.ORDER_INITIATED {
 		order.StatusCode = global_constant.ORDER_TIMEOUT
 		s.orderRepository.Update(context.TODO(), order.DocId, order)
+
+		event := order.ToEvent(global_constant.OPERATION_UPDATE)
+		common.AddToChanCRUD(event)
 		return true
 	}
 
@@ -84,7 +86,7 @@ func (s *orderService) DeleteOrder(docId string) error {
 	deleteError := s.orderRepository.Delete(context.Background(), docId)
 
 	event := order.ToEvent(global_constant.OPERATION_DELETE)
-	channels.AddToChanCRUD(event)
+	common.AddToChanCRUD(event)
 
 	return deleteError
 }

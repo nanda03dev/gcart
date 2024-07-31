@@ -6,7 +6,6 @@ import (
 	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
-	"github.com/nanda03dev/go2ms/utils"
 )
 
 type EventService interface {
@@ -26,7 +25,7 @@ func NewEventService(eventRepository *repositories.EventRepository) EventService
 }
 
 func (s *eventService) CreateEvent(event models.Event) (models.Event, error) {
-	event.DocId = utils.Generate16DigitUUID()
+	event.DocId = models.Generate16DigitUUID()
 	return event, s.eventRepository.Create(context.Background(), event)
 }
 

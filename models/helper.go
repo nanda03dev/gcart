@@ -1,4 +1,4 @@
-package utils
+package models
 
 import (
 	"time"
@@ -7,7 +7,6 @@ import (
 	"github.com/nanda03dev/gnosql_client"
 	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/global_constant"
-	"github.com/nanda03dev/go2ms/models"
 )
 
 func Generate16DigitUUID() string {
@@ -15,32 +14,20 @@ func Generate16DigitUUID() string {
 	return uuidObj.String()
 }
 
-// extractTimestampFromUUID extracts the timestamp from a version 1 UUID
-func ExtractTimestampFromUUID(uuidStr string) time.Time {
-	u, err := uuid.Parse(uuidStr)
-	if err != nil {
-		print(err)
-	}
-	// Version 1 UUID layout: time_low-time_mid-time_hi_and_version-clock_seq_hi_and_reserved-clock_seq_low-node
-	// Extract timestamp from time_low, time_mid, and time_hi_and_version
-	timestamp := int64(u[0])<<56 | int64(u[1])<<48 | int64(u[2])<<40 | int64(u[3])<<32 | int64(u[4])<<24 | int64(u[5])<<16 | int64(u[6])<<8 | int64(u[7])
-	return time.Unix(0, timestamp)
-}
-
 func GetGnosqlCollection(entityType common.EntityNameType) gnosql_client.CollectionInput {
 	switch entityType {
 	case global_constant.ENTITY_CITY:
-		return models.CityGnosql
+		return CityGnosql
 	case global_constant.ENTITY_USER:
-		return models.UserGnosql
+		return UserGnosql
 	case global_constant.ENTITY_PRODUCT:
-		return models.ProductGnosql
+		return ProductGnosql
 	case global_constant.ENTITY_ORDER:
-		return models.OrderGnosql
+		return OrderGnosql
 	case global_constant.ENTITY_ITEM:
-		return models.ItemGnosql
+		return ItemGnosql
 	case global_constant.ENTITY_PAYMENT:
-		return models.PaymentGnosql
+		return PaymentGnosql
 
 	default:
 		return gnosql_client.CollectionInput{}
@@ -49,13 +36,14 @@ func GetGnosqlCollection(entityType common.EntityNameType) gnosql_client.Collect
 
 func IsRequireToStoreEvent(entityType common.EntityNameType) bool {
 	switch entityType {
-	case global_constant.ENTITY_CITY,
+	case
 		global_constant.ENTITY_USER,
 		global_constant.ENTITY_PRODUCT,
 		global_constant.ENTITY_ITEM:
 		return false
 	case global_constant.ENTITY_ORDER,
-		global_constant.ENTITY_PAYMENT:
+		global_constant.ENTITY_PAYMENT,
+		global_constant.ENTITY_CITY:
 		return true
 	default:
 		return false
@@ -78,4 +66,36 @@ func IsEventTimeExpired(entityType common.EntityNameType, eventCreatedAt time.Ti
 	}
 
 	return time.Now().After(expireTime)
+}
+
+func GetCheckProcess(entityType common.EntityNameType, operationType common.OperationType) common.CheckProcess {
+	switch entityType {
+	case global_constant.ENTITY_ORDER, global_constant.ENTITY_PAYMENT:
+		if operationType == global_constant.OPERATION_CREATE {
+			return global_constant.CHECK_TIMEOUT
+		}
+	case global_constant.ENTITY_CITY,
+		global_constant.ENTITY_USER,
+		global_constant.ENTITY_PRODUCT,
+		global_constant.ENTITY_ITEM:
+		return ""
+	}
+	return ""
+}
+
+func GetStringValue(document gnosql_client.Document, key string) string {
+	value, _ := document[key]
+	return value.(string)
+}
+func GetIntegerValue(document gnosql_client.Document, key string) int {
+	value, _ := document[key]
+	return value.(int)
+}
+func GetBoolValue(document gnosql_client.Document, key string) bool {
+	value, _ := document[key]
+	return value.(bool)
+}
+func GetValue[T any](document gnosql_client.Document, key string) T {
+	value, _ := document[key]
+	return value.(T)
 }

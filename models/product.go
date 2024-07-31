@@ -29,10 +29,10 @@ func (product Product) ToDocument() gnosql_client.Document {
 
 func (product Product) ToModel(productDocument gnosql_client.Document) Product {
 	return Product{
-		DocId:  common.GetStringValue(productDocument, "docId"),
-		Name:   common.GetStringValue(productDocument, "name"),
-		Amount: common.GetIntegerValue(productDocument, "amount"),
-		Status: common.GetValue[common.StatusCode](productDocument, "statusCode"),
+		DocId:  GetStringValue(productDocument, "docId"),
+		Name:   GetStringValue(productDocument, "name"),
+		Amount: GetIntegerValue(productDocument, "amount"),
+		Status: GetValue[common.StatusCode](productDocument, "statusCode"),
 	}
 }
 

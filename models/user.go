@@ -31,11 +31,11 @@ func (user User) ToDocument() gnosql_client.Document {
 
 func (user User) ToModel(userDocument gnosql_client.Document) User {
 	return User{
-		DocId:   common.GetStringValue(userDocument, "docId"),
-		Name:    common.GetStringValue(userDocument, "name"),
-		Email:   common.GetStringValue(userDocument, "email"),
-		Address: common.GetStringValue(userDocument, "address"),
-		CityID:  common.GetStringValue(userDocument, "cityId"),
+		DocId:   GetStringValue(userDocument, "docId"),
+		Name:    GetStringValue(userDocument, "name"),
+		Email:   GetStringValue(userDocument, "email"),
+		Address: GetStringValue(userDocument, "address"),
+		CityID:  GetStringValue(userDocument, "cityId"),
 	}
 }
 

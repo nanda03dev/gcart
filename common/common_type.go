@@ -21,11 +21,13 @@ type RequestFilterBodyType struct {
 type EntityNameType string
 type OperationType string
 type StatusCode string
+type CheckProcess string
 
 type EventType struct {
 	EntityId      string
 	EntityType    EntityNameType
 	OperationType OperationType
+	CheckProcess  CheckProcess
 	RetryCount    int
 }
 

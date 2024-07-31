@@ -8,7 +8,6 @@ import (
 	"github.com/nanda03dev/go2ms/global_constant"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
-	"github.com/nanda03dev/go2ms/utils"
 )
 
 type UserService interface {
@@ -28,7 +27,7 @@ func NewUserService(userRepository *repositories.UserRepository) UserService {
 }
 
 func (s *userService) CreateUser(user models.User) (models.User, error) {
-	user.DocId = utils.Generate16DigitUUID()
+	user.DocId = models.Generate16DigitUUID()
 	createError := s.userRepository.Create(context.Background(), user)
 
 	event := user.ToEvent(global_constant.OPERATION_CREATE)

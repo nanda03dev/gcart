@@ -8,7 +8,6 @@ import (
 	"github.com/nanda03dev/go2ms/global_constant"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
-	"github.com/nanda03dev/go2ms/utils"
 )
 
 type OrderService interface {
@@ -29,7 +28,7 @@ func NewOrderService(orderRepository *repositories.OrderRepository) OrderService
 }
 
 func (s *orderService) CreateOrder(order models.Order) (models.Order, error) {
-	order.DocId = utils.Generate16DigitUUID()
+	order.DocId = models.Generate16DigitUUID()
 	order.StatusCode = global_constant.ORDER_INITIATED
 	createError := s.orderRepository.Create(context.Background(), order)
 

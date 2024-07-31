@@ -8,7 +8,6 @@ import (
 	"github.com/nanda03dev/go2ms/global_constant"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
-	"github.com/nanda03dev/go2ms/utils"
 )
 
 type ProductService interface {
@@ -28,7 +27,7 @@ func NewProductService(productRepository *repositories.ProductRepository) Produc
 }
 
 func (s *productService) CreateProduct(product models.Product) (models.Product, error) {
-	product.DocId = utils.Generate16DigitUUID()
+	product.DocId = models.Generate16DigitUUID()
 	createError := s.productRepository.Create(context.Background(), product)
 
 	event := product.ToEvent(global_constant.OPERATION_CREATE)

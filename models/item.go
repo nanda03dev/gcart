@@ -21,11 +21,11 @@ var ItemGnosql = gnosql_client.CollectionInput{
 
 func (item Item) ToModel(itemDocument gnosql_client.Document) Item {
 	return Item{
-		DocId:      common.GetStringValue(itemDocument, "docId"),
-		OrderId:    common.GetStringValue(itemDocument, "orderId"),
-		Name:       common.GetStringValue(itemDocument, "name"),
-		Amount:     common.GetIntegerValue(itemDocument, "amount"),
-		StatusCode: common.GetValue[common.StatusCode](itemDocument, "statusCode"),
+		DocId:      GetStringValue(itemDocument, "docId"),
+		OrderId:    GetStringValue(itemDocument, "orderId"),
+		Name:       GetStringValue(itemDocument, "name"),
+		Amount:     GetIntegerValue(itemDocument, "amount"),
+		StatusCode: GetValue[common.StatusCode](itemDocument, "statusCode"),
 	}
 }
 

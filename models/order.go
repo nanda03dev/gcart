@@ -29,18 +29,20 @@ func (order Order) ToDocument() gnosql_client.Document {
 
 func (order Order) ToModel(orderDocument gnosql_client.Document) Order {
 	return Order{
-		DocId:      common.GetStringValue(orderDocument, "docId"),
-		Amount:     common.GetIntegerValue(orderDocument, "amount"),
-		UserID:     common.GetStringValue(orderDocument, "userId"),
-		StatusCode: common.GetValue[common.StatusCode](orderDocument, "statusCode"),
+		DocId:      GetStringValue(orderDocument, "docId"),
+		Amount:     GetIntegerValue(orderDocument, "amount"),
+		UserID:     GetStringValue(orderDocument, "userId"),
+		StatusCode: GetValue[common.StatusCode](orderDocument, "statusCode"),
 	}
 }
 
 func (order Order) ToEvent(operationType common.OperationType) common.EventType {
+
 	return common.EventType{
 		EntityId:      order.DocId,
 		EntityType:    global_constant.ENTITY_ORDER,
 		OperationType: operationType,
+		CheckProcess:  GetCheckProcess(global_constant.ENTITY_ORDER, operationType),
 	}
 }
 

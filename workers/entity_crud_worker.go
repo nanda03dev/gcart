@@ -11,7 +11,6 @@ import (
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
 	"github.com/nanda03dev/go2ms/services"
-	"github.com/nanda03dev/go2ms/utils"
 )
 
 func StartCRUDWorker() {
@@ -30,9 +29,10 @@ func StartCRUDWorker() {
 			EntityType:    crudEvent.EntityType,
 			OperationType: crudEvent.OperationType,
 			CreatedAt:     time.Now(),
+			CheckProcess:  crudEvent.CheckProcess,
 		}
 
-		collectionName := utils.GetGnosqlCollection(crudEvent.EntityType).CollectionName
+		collectionName := models.GetGnosqlCollection(crudEvent.EntityType).CollectionName
 		entityGnosql := config.GnoSQLDB.Collections[collectionName]
 		var docmentToCreate gnosql_client.Document
 
@@ -85,7 +85,7 @@ func StartCRUDWorker() {
 			}
 		}
 
-		if utils.IsRequireToStoreEvent(event.EntityType) {
+		if models.IsRequireToStoreEvent(event.EntityType) {
 			repositories.AppRepositories.Event.Create(context.TODO(), event)
 		}
 	}

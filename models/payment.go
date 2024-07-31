@@ -31,11 +31,11 @@ func (payment Payment) ToDocument() gnosql_client.Document {
 
 func (payment Payment) ToModel(paymentDocument gnosql_client.Document) Payment {
 	return Payment{
-		DocId:      common.GetStringValue(paymentDocument, "docId"),
-		OrderId:    common.GetStringValue(paymentDocument, "orderId"),
-		Name:       common.GetStringValue(paymentDocument, "name"),
-		Amount:     common.GetIntegerValue(paymentDocument, "amount"),
-		StatusCode: common.GetValue[common.StatusCode](paymentDocument, "statusCode"),
+		DocId:      GetStringValue(paymentDocument, "docId"),
+		OrderId:    GetStringValue(paymentDocument, "orderId"),
+		Name:       GetStringValue(paymentDocument, "name"),
+		Amount:     GetIntegerValue(paymentDocument, "amount"),
+		StatusCode: GetValue[common.StatusCode](paymentDocument, "statusCode"),
 	}
 }
 
@@ -44,6 +44,7 @@ func (payment Payment) ToEvent(operationType common.OperationType) common.EventT
 		EntityId:      payment.DocId,
 		EntityType:    global_constant.ENTITY_PAYMENT,
 		OperationType: operationType,
+		CheckProcess:  GetCheckProcess(global_constant.ENTITY_ORDER, operationType),
 	}
 }
 

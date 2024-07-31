@@ -19,9 +19,9 @@ var CityGnosql = gnosql_client.CollectionInput{
 
 func (city City) ToModel(cityDocument gnosql_client.Document) City {
 	return City{
-		DocId:       common.GetStringValue(cityDocument, "docId"),
-		Name:        common.GetStringValue(cityDocument, "name"),
-		CountryCode: common.GetStringValue(cityDocument, "countryCode"),
+		DocId:       GetStringValue(cityDocument, "docId"),
+		Name:        GetStringValue(cityDocument, "name"),
+		CountryCode: GetStringValue(cityDocument, "countryCode"),
 	}
 }
 

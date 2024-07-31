@@ -8,7 +8,6 @@ import (
 	"github.com/nanda03dev/go2ms/global_constant"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
-	"github.com/nanda03dev/go2ms/utils"
 )
 
 type PaymentService interface {
@@ -29,7 +28,7 @@ func NewPaymentService(paymentRepository *repositories.PaymentRepository) Paymen
 }
 
 func (s *paymentService) CreatePayment(payment models.Payment) (models.Payment, error) {
-	payment.DocId = utils.Generate16DigitUUID()
+	payment.DocId = models.Generate16DigitUUID()
 	payment.StatusCode = global_constant.PAYMENT_INITIATED
 	createError := s.paymentRepository.Create(context.Background(), payment)
 

@@ -19,6 +19,10 @@ const (
 	OPERATION_UPDATE common.OperationType = "UPDATE"
 	OPERATION_DELETE common.OperationType = "DELETE"
 )
+const (
+	CHECK_TIMEOUT      common.CheckProcess = "CHECK_TIMEOUT"
+	CHECK_TIMEOUT_DONE common.CheckProcess = "CHECK_TIMEOUT_DONE"
+)
 
 const (
 	// Order status statusCode

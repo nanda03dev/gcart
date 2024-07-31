@@ -1,20 +1,19 @@
 package common
 
-import "github.com/nanda03dev/gnosql_client"
+import (
+	"time"
 
-func GetStringValue(document gnosql_client.Document, key string) string {
-	value, _ := document[key]
-	return value.(string)
-}
-func GetIntegerValue(document gnosql_client.Document, key string) int {
-	value, _ := document[key]
-	return value.(int)
-}
-func GetBoolValue(document gnosql_client.Document, key string) bool {
-	value, _ := document[key]
-	return value.(bool)
-}
-func GetValue[T any](document gnosql_client.Document, key string) T {
-	value, _ := document[key]
-	return value.(T)
+	"github.com/google/uuid"
+)
+
+// extractTimestampFromUUID extracts the timestamp from a version 1 UUID
+func ExtractTimestampFromUUID(uuidStr string) time.Time {
+	u, err := uuid.Parse(uuidStr)
+	if err != nil {
+		print(err)
+	}
+	// Version 1 UUID layout: time_low-time_mid-time_hi_and_version-clock_seq_hi_and_reserved-clock_seq_low-node
+	// Extract timestamp from time_low, time_mid, and time_hi_and_version
+	timestamp := int64(u[0])<<56 | int64(u[1])<<48 | int64(u[2])<<40 | int64(u[3])<<32 | int64(u[4])<<24 | int64(u[5])<<16 | int64(u[6])<<8 | int64(u[7])
+	return time.Unix(0, timestamp)
 }

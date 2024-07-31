@@ -8,7 +8,6 @@ import (
 	"github.com/nanda03dev/go2ms/global_constant"
 	"github.com/nanda03dev/go2ms/models"
 	"github.com/nanda03dev/go2ms/repositories"
-	"github.com/nanda03dev/go2ms/utils"
 )
 
 type ItemService interface {
@@ -29,7 +28,7 @@ func NewItemService(itemRepository *repositories.ItemRepository) ItemService {
 }
 
 func (s *itemService) CreateItem(item models.Item) (models.Item, error) {
-	item.DocId = utils.Generate16DigitUUID()
+	item.DocId = models.Generate16DigitUUID()
 	item.StatusCode = global_constant.ITEM_INITIATED
 	createError := s.itemRepository.Create(context.Background(), item)
 

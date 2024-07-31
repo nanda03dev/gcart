@@ -11,6 +11,7 @@ type Event struct {
 	EntityId      string                `json:"entityId" bson:"entityId"`
 	EntityType    common.EntityNameType `json:"entityType" bson:"entityType"`
 	OperationType common.OperationType  `json:"operationType" bson:"operationType"`
+	CheckProcess  common.CheckProcess   `json:"checkProcess" bson:"checkProcess"`
 	Published     bool                  `json:"published" bson:"published"`
 	CreatedAt     time.Time             `json:"createdAt" bson:"createdAt"`
 }

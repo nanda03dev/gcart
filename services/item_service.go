@@ -17,6 +17,7 @@ type ItemService interface {
 	UpdateItem(item models.Item) error
 	UpdateItemsTimeout(requestFilterBody common.FiltersBodyType) error
 	DeleteItem(docId string) error
+	DeleteOrderItems(orderId string) error
 }
 
 type itemService struct {
@@ -73,7 +74,6 @@ func (s *itemService) UpdateItemsTimeout(filter common.FiltersBodyType) error {
 	for _, item := range items {
 		event := item.ToEvent(global_constant.OPERATION_UPDATE)
 		common.AddToChanCRUD(event)
-
 	}
 	return updateManyError
 }
@@ -88,6 +88,23 @@ func (s *itemService) DeleteItem(docId string) error {
 
 	event := item.ToEvent(global_constant.OPERATION_DELETE)
 	common.AddToChanCRUD(event)
+
+	return deleteError
+}
+
+func (s *itemService) DeleteOrderItems(orderId string) error {
+
+	orderIdFilter := common.FiltersBodyType{
+		{Key: "orderId", Value: orderId},
+	}
+	items := s.itemRepository.GetAllItemsByOrderId(orderId)
+
+	deleteError := s.itemRepository.DeleteMany(context.Background(), orderIdFilter)
+
+	for _, item := range items {
+		event := item.ToEvent(global_constant.OPERATION_DELETE)
+		common.AddToChanCRUD(event)
+	}
 
 	return deleteError
 }

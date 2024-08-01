@@ -82,10 +82,14 @@ func (s *orderService) DeleteOrder(docId string) error {
 	if getByIdError != nil {
 		return errors.New(global_constant.ENTITY_NOT_FOUND)
 	}
+
 	deleteError := s.orderRepository.Delete(context.Background(), docId)
 
 	event := order.ToEvent(global_constant.OPERATION_DELETE)
 	common.AddToChanCRUD(event)
+
+	AppServices.Item.DeleteOrderItems(order.DocId)
+	AppServices.Payment.DeleteOrderPayments(order.DocId)
 
 	return deleteError
 }

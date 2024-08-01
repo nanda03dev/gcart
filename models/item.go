@@ -9,7 +9,7 @@ import (
 type Item struct {
 	DocId      string            `json:"docId" bson:"docId"`
 	OrderId    string            `json:"orderId" bson:"orderId"`
-	Name       string            `json:"name" bson:"name"`
+	ProductId  string            `json:"productId" bson:"productId"`
 	Amount     int               `json:"amount" bson:"amount"`
 	StatusCode common.StatusCode `json:"statusCode" bson:"statusCode"`
 }
@@ -23,7 +23,7 @@ func (item Item) ToModel(itemDocument gnosql_client.Document) Item {
 	return Item{
 		DocId:      GetStringValue(itemDocument, "docId"),
 		OrderId:    GetStringValue(itemDocument, "orderId"),
-		Name:       GetStringValue(itemDocument, "name"),
+		ProductId:  GetStringValue(itemDocument, "productId"),
 		Amount:     GetIntegerValue(itemDocument, "amount"),
 		StatusCode: GetValue[common.StatusCode](itemDocument, "statusCode"),
 	}
@@ -33,7 +33,7 @@ func (item Item) ToDocument() gnosql_client.Document {
 	return gnosql_client.Document{
 		"docId":      item.DocId,
 		"orderId":    item.OrderId,
-		"name":       item.Name,
+		"productId":  item.ProductId,
 		"amount":     item.Amount,
 		"statusCode": item.StatusCode,
 	}

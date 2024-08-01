@@ -17,6 +17,7 @@ type PaymentService interface {
 	UpdatePayment(payment models.Payment) error
 	UpdatePaymentTimeout(docId string) bool
 	DeletePayment(docId string) error
+	DeleteOrderPayments(orderId string) error
 }
 
 type paymentService struct {
@@ -87,5 +88,21 @@ func (s *paymentService) DeletePayment(docId string) error {
 	event := payment.ToEvent(global_constant.OPERATION_DELETE)
 	common.AddToChanCRUD(event)
 
+	return deleteError
+}
+
+func (s *paymentService) DeleteOrderPayments(orderId string) error {
+	orderIdFilter := common.FiltersBodyType{
+		{Key: "orderId", Value: orderId},
+	}
+
+	payments := s.paymentRepository.GetAllPaymentsByOrderId(orderId)
+
+	deleteError := s.paymentRepository.DeleteMany(context.Background(), orderIdFilter)
+
+	for _, payment := range payments {
+		event := payment.ToEvent(global_constant.OPERATION_DELETE)
+		common.AddToChanCRUD(event)
+	}
 	return deleteError
 }

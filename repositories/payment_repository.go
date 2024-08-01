@@ -1,6 +1,9 @@
 package repositories
 
 import (
+	"context"
+
+	"github.com/nanda03dev/go2ms/common"
 	"github.com/nanda03dev/go2ms/models"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -16,3 +19,13 @@ func NewPaymentRepository(db *mongo.Database) *PaymentRepository {
 }
 
 // Additional methods specific to payment repository can be added here
+
+func (r *PaymentRepository) GetAllPaymentsByOrderId(orderId string) []models.Payment {
+	filters := common.FiltersBodyType{
+		{Key: "orderId", Value: orderId},
+	}
+
+	results, _ := r.GetAll(context.Background(), filters, nil, nil)
+
+	return results
+}

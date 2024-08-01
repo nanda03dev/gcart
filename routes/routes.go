@@ -13,6 +13,7 @@ func InitializeRouter() *gin.Engine {
 	orderController := controllers.NewOrderController(services.AppServices.Order)
 	cityController := controllers.NewCityController(services.AppServices.City)
 	productController := controllers.NewProductController(services.AppServices.Product)
+	paymentController := controllers.NewPaymentController(services.AppServices.Payment)
 	itemController := controllers.NewItemController(services.AppServices.Item)
 	eventController := controllers.NewEventController(services.AppServices.Event)
 
@@ -50,6 +51,15 @@ func InitializeRouter() *gin.Engine {
 		productRoutes.GET("/:id", productController.GetProductByID)
 		productRoutes.PUT("/:id", productController.UpdateProduct)
 		productRoutes.DELETE("/:id", productController.DeleteProduct)
+	}
+
+	paymentsRoutes := router.Group("/payments")
+	{
+		paymentsRoutes.POST("/", paymentController.CreatePayment)
+		paymentsRoutes.POST("/filter", paymentController.GetAllPayments)
+		paymentsRoutes.GET("/:id", paymentController.GetPaymentByID)
+		paymentsRoutes.PUT("/:id", paymentController.UpdatePayment)
+		paymentsRoutes.DELETE("/:id", paymentController.DeletePayment)
 	}
 
 	itemRoutes := router.Group("/items")

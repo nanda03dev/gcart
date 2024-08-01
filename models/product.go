@@ -20,10 +20,10 @@ var ProductGnosql = gnosql_client.CollectionInput{
 
 func (product Product) ToDocument() gnosql_client.Document {
 	return gnosql_client.Document{
-		"docId":  product.DocId,
-		"name":   product.Name,
-		"amount": product.Amount,
-		"status": product.Status,
+		"docId":      product.DocId,
+		"name":       product.Name,
+		"amount":     product.Amount,
+		"statusCode": product.Status,
 	}
 }
 

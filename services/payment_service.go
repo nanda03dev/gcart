@@ -67,6 +67,9 @@ func (s *paymentService) UpdatePaymentTimeout(docId string) bool {
 	if payment.StatusCode == global_constant.PAYMENT_INITIATED {
 		payment.StatusCode = global_constant.PAYMENT_TIMEOUT
 		s.paymentRepository.Update(context.TODO(), payment.DocId, payment)
+
+		event := payment.ToEvent(global_constant.OPERATION_UPDATE)
+		common.AddToChanCRUD(event)
 		return true
 	}
 

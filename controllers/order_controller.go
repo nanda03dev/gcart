@@ -31,7 +31,7 @@ func (c *OrderController) CreateOrder(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, ToSuccessResponse(global_constant.DATA_CREATED_SUCCESSFULLY, order.DocId))
+	ctx.JSON(http.StatusCreated, ToSuccessResponse(global_constant.ENTITY_CREATED_SUCCESSFULLY, order.DocId))
 }
 
 func (c *OrderController) GetAllOrders(ctx *gin.Context) {
@@ -46,7 +46,7 @@ func (c *OrderController) GetAllOrders(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.DATA_FETCHED_SUCCESSFULLY, orders))
+	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_FETCHED_SUCCESSFULLY, orders))
 
 }
 
@@ -58,7 +58,7 @@ func (c *OrderController) GetOrderByID(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.DATA_FETCHED_SUCCESSFULLY, order))
+	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_FETCHED_SUCCESSFULLY, order))
 }
 
 func (c *OrderController) UpdateOrder(ctx *gin.Context) {
@@ -74,7 +74,22 @@ func (c *OrderController) UpdateOrder(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.DATA_UPDATED_SUCCESSFULLY, nil))
+	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_UPDATED_SUCCESSFULLY, nil))
+}
+
+func (c *OrderController) ConfirmOrder(ctx *gin.Context) {
+	var orderConfirmBody common.OrderConfirmBody
+
+	if err := ctx.ShouldBindJSON(&orderConfirmBody); err != nil {
+		ctx.JSON(http.StatusBadRequest, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
+		return
+	}
+
+	if err := c.orderService.ConfirmOrder(orderConfirmBody); err != nil {
+		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
+		return
+	}
+	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_UPDATED_SUCCESSFULLY, nil))
 }
 
 func (c *OrderController) DeleteOrder(ctx *gin.Context) {
@@ -84,5 +99,5 @@ func (c *OrderController) DeleteOrder(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.DATA_DELETED_SUCCESSFULLY, nil))
+	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_DELETED_SUCCESSFULLY, nil))
 }

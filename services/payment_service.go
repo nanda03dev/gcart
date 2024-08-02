@@ -13,6 +13,7 @@ import (
 type PaymentService interface {
 	CreatePayment(payment models.Payment) (models.Payment, error)
 	GetAllPayments(requestFilterBody common.RequestFilterBodyType) ([]models.Payment, error)
+	GetAllPaymentsByOrderId(orderId string) ([]models.Payment, error)
 	GetPaymentByID(docId string) (models.Payment, error)
 	UpdatePayment(payment models.Payment) error
 	UpdatePaymentTimeout(docId string) bool
@@ -43,6 +44,10 @@ func (s *paymentService) GetAllPayments(requestFilterBody common.RequestFilterBo
 	return s.paymentRepository.GetAll(context.Background(), requestFilterBody.ListOfFilter, requestFilterBody.SortBody, requestFilterBody.Size)
 }
 
+func (s *paymentService) GetAllPaymentsByOrderId(orderId string) ([]models.Payment, error) {
+	return s.paymentRepository.GetAllPaymentsByOrderId(orderId)
+}
+
 func (s *paymentService) GetPaymentByID(docId string) (models.Payment, error) {
 	return s.paymentRepository.GetByID(context.Background(), docId)
 }
@@ -51,7 +56,7 @@ func (s *paymentService) UpdatePayment(updatePayment models.Payment) error {
 	payment, getByIdError := s.paymentRepository.GetByID(context.Background(), updatePayment.DocId)
 
 	if getByIdError != nil {
-		return errors.New(global_constant.ENTITY_NOT_FOUND)
+		return errors.New(global_constant.ERROR_ENTITY_NOT_FOUND)
 	}
 
 	updateError := s.paymentRepository.Update(context.Background(), payment.DocId, payment.ToUpdatedDocument(updatePayment))
@@ -81,7 +86,7 @@ func (s *paymentService) DeletePayment(docId string) error {
 	payment, getByIdError := s.paymentRepository.GetByID(context.Background(), docId)
 
 	if getByIdError != nil {
-		return errors.New(global_constant.ENTITY_NOT_FOUND)
+		return errors.New(global_constant.ERROR_ENTITY_NOT_FOUND)
 	}
 	deleteError := s.paymentRepository.Delete(context.Background(), docId)
 
@@ -96,7 +101,7 @@ func (s *paymentService) DeleteOrderPayments(orderId string) error {
 		{Key: "orderId", Value: orderId},
 	}
 
-	payments := s.paymentRepository.GetAllPaymentsByOrderId(orderId)
+	payments, _ := s.paymentRepository.GetAllPaymentsByOrderId(orderId)
 
 	deleteError := s.paymentRepository.DeleteMany(context.Background(), orderIdFilter)
 

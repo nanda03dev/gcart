@@ -48,7 +48,7 @@ func (s *productService) UpdateProduct(updateProduct models.Product) error {
 	product, getByIdError := s.productRepository.GetByID(context.Background(), updateProduct.DocId)
 
 	if getByIdError != nil {
-		return errors.New(global_constant.ENTITY_NOT_FOUND)
+		return errors.New(global_constant.ERROR_ENTITY_NOT_FOUND)
 	}
 
 	updateError := s.productRepository.Update(context.Background(), product.DocId, product.ToUpdatedDocument(updateProduct))
@@ -63,7 +63,7 @@ func (s *productService) DeleteProduct(docId string) error {
 	product, getByIdError := s.productRepository.GetByID(context.Background(), docId)
 
 	if getByIdError != nil {
-		return errors.New(global_constant.ENTITY_NOT_FOUND)
+		return errors.New(global_constant.ERROR_ENTITY_NOT_FOUND)
 	}
 	deleteError := s.productRepository.Delete(context.Background(), docId)
 

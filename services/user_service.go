@@ -48,7 +48,7 @@ func (s *userService) UpdateUser(updateUser models.User) error {
 	user, getByIdError := s.userRepository.GetByID(context.Background(), updateUser.DocId)
 
 	if getByIdError != nil {
-		return errors.New(global_constant.ENTITY_NOT_FOUND)
+		return errors.New(global_constant.ERROR_ENTITY_NOT_FOUND)
 	}
 
 	updateError := s.userRepository.Update(context.Background(), user.DocId, user.ToUpdatedDocument(updateUser))
@@ -63,7 +63,7 @@ func (s *userService) DeleteUser(docId string) error {
 	user, getByIdError := s.userRepository.GetByID(context.Background(), docId)
 
 	if getByIdError != nil {
-		return errors.New(global_constant.ENTITY_NOT_FOUND)
+		return errors.New(global_constant.ERROR_ENTITY_NOT_FOUND)
 	}
 	deleteError := s.userRepository.Delete(context.Background(), docId)
 

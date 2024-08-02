@@ -31,7 +31,7 @@ func (c *ProductController) CreateProduct(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, ToSuccessResponse(global_constant.DATA_CREATED_SUCCESSFULLY, product.DocId))
+	ctx.JSON(http.StatusCreated, ToSuccessResponse(global_constant.ENTITY_CREATED_SUCCESSFULLY, product.DocId))
 }
 
 func (c *ProductController) GetAllProducts(ctx *gin.Context) {
@@ -46,7 +46,7 @@ func (c *ProductController) GetAllProducts(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.DATA_FETCHED_SUCCESSFULLY, products))
+	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_FETCHED_SUCCESSFULLY, products))
 }
 
 func (c *ProductController) GetProductByID(ctx *gin.Context) {
@@ -57,7 +57,7 @@ func (c *ProductController) GetProductByID(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.DATA_FETCHED_SUCCESSFULLY, product))
+	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_FETCHED_SUCCESSFULLY, product))
 }
 
 func (c *ProductController) UpdateProduct(ctx *gin.Context) {
@@ -73,7 +73,7 @@ func (c *ProductController) UpdateProduct(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.DATA_UPDATED_SUCCESSFULLY, nil))
+	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_UPDATED_SUCCESSFULLY, nil))
 }
 
 func (c *ProductController) DeleteProduct(ctx *gin.Context) {
@@ -83,5 +83,5 @@ func (c *ProductController) DeleteProduct(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.DATA_DELETED_SUCCESSFULLY, nil))
+	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_DELETED_SUCCESSFULLY, nil))
 }

@@ -18,6 +18,10 @@ type RequestFilterBodyType struct {
 	SortBody     SortBodyType    `json:"sort"`
 }
 
+type OrderConfirmBody struct {
+	OrderId string `json:"orderId"`
+}
+
 type EntityNameType string
 type OperationType string
 type StatusCode string

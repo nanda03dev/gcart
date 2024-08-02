@@ -48,7 +48,7 @@ func (s *cityService) UpdateCity(updateCity models.City) error {
 	city, getByIdError := s.cityRepository.GetByID(context.Background(), updateCity.DocId)
 
 	if getByIdError != nil {
-		return errors.New(global_constant.ENTITY_NOT_FOUND)
+		return errors.New(global_constant.ERROR_ENTITY_NOT_FOUND)
 	}
 
 	updateError := s.cityRepository.Update(context.Background(), city.DocId, city.ToUpdatedDocument(updateCity))
@@ -63,7 +63,7 @@ func (s *cityService) DeleteCity(docId string) error {
 	city, getByIdError := s.cityRepository.GetByID(context.Background(), docId)
 
 	if getByIdError != nil {
-		return errors.New(global_constant.ENTITY_NOT_FOUND)
+		return errors.New(global_constant.ERROR_ENTITY_NOT_FOUND)
 	}
 	deleteError := s.cityRepository.Delete(context.Background(), docId)
 

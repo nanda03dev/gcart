@@ -20,12 +20,12 @@ func NewPaymentRepository(db *mongo.Database) *PaymentRepository {
 
 // Additional methods specific to payment repository can be added here
 
-func (r *PaymentRepository) GetAllPaymentsByOrderId(orderId string) []models.Payment {
+func (r *PaymentRepository) GetAllPaymentsByOrderId(orderId string) ([]models.Payment, error) {
 	filters := common.FiltersBodyType{
 		{Key: "orderId", Value: orderId},
 	}
 
-	results, _ := r.GetAll(context.Background(), filters, nil, nil)
+	results, getAllError := r.GetAll(context.Background(), filters, nil, nil)
 
-	return results
+	return results, getAllError
 }

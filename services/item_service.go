@@ -18,6 +18,7 @@ type ItemService interface {
 	UpdateItemsTimeout(requestFilterBody common.FiltersBodyType) error
 	DeleteItem(docId string) error
 	DeleteOrderItems(orderId string) error
+	ConfirmOrderItems(orderId string) error
 }
 
 type itemService struct {
@@ -43,6 +44,10 @@ func (s *itemService) GetAllItems(requestFilterBody common.RequestFilterBodyType
 	return s.itemRepository.GetAll(context.Background(), requestFilterBody.ListOfFilter, requestFilterBody.SortBody, requestFilterBody.Size)
 }
 
+func (s *itemService) GetAllItemsByOrderId(orderId string) ([]models.Item, error) {
+	return s.itemRepository.GetAllItemsByOrderId(orderId)
+}
+
 func (s *itemService) GetItemByID(docId string) (models.Item, error) {
 	return s.itemRepository.GetByID(context.Background(), docId)
 }
@@ -51,7 +56,7 @@ func (s *itemService) UpdateItem(updateItem models.Item) error {
 	item, getByIdError := s.itemRepository.GetByID(context.Background(), updateItem.DocId)
 
 	if getByIdError != nil {
-		return errors.New(global_constant.ENTITY_NOT_FOUND)
+		return errors.New(global_constant.ERROR_ENTITY_NOT_FOUND)
 	}
 
 	updateError := s.itemRepository.Update(context.Background(), item.DocId, item.ToUpdatedDocument(updateItem))
@@ -82,7 +87,7 @@ func (s *itemService) DeleteItem(docId string) error {
 	item, getByIdError := s.itemRepository.GetByID(context.Background(), docId)
 
 	if getByIdError != nil {
-		return errors.New(global_constant.ENTITY_NOT_FOUND)
+		return errors.New(global_constant.ERROR_ENTITY_NOT_FOUND)
 	}
 	deleteError := s.itemRepository.Delete(context.Background(), docId)
 
@@ -97,7 +102,7 @@ func (s *itemService) DeleteOrderItems(orderId string) error {
 	orderIdFilter := common.FiltersBodyType{
 		{Key: "orderId", Value: orderId},
 	}
-	items := s.itemRepository.GetAllItemsByOrderId(orderId)
+	items, _ := s.itemRepository.GetAllItemsByOrderId(orderId)
 
 	deleteError := s.itemRepository.DeleteMany(context.Background(), orderIdFilter)
 
@@ -107,4 +112,28 @@ func (s *itemService) DeleteOrderItems(orderId string) error {
 	}
 
 	return deleteError
+}
+
+func (s *itemService) ConfirmOrderItems(orderId string) error {
+
+	orderIdFilter := common.FiltersBodyType{
+		{Key: "orderId", Value: orderId},
+	}
+
+	items, _ := s.itemRepository.GetAllItemsByOrderId(orderId)
+
+	updateDocument := map[string]string{
+		"statusCode": string(global_constant.ITEM_CONFIRMED),
+	}
+
+	updateError := s.itemRepository.UpdateMany(context.Background(), orderIdFilter, updateDocument)
+
+	if updateError == nil {
+		for _, item := range items {
+			event := item.ToEvent(global_constant.OPERATION_CONFIRMED)
+			common.AddToChanCRUD(event)
+		}
+	}
+
+	return updateError
 }

@@ -20,12 +20,12 @@ func NewItemRepository(db *mongo.Database) *ItemRepository {
 
 // Additional methods specific to item repository can be added here
 
-func (r *ItemRepository) GetAllItemsByOrderId(orderId string) []models.Item {
+func (r *ItemRepository) GetAllItemsByOrderId(orderId string) ([]models.Item, error) {
 	filters := common.FiltersBodyType{
 		{Key: "orderId", Value: orderId},
 	}
 
-	results, _ := r.GetAll(context.Background(), filters, nil, nil)
+	results, getAllError := r.GetAll(context.Background(), filters, nil, nil)
 
-	return results
+	return results, getAllError
 }

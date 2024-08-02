@@ -5,13 +5,14 @@ import (
 )
 
 const (
-	ENTITY_CITY    common.EntityNameType = "CITY"
-	ENTITY_USER    common.EntityNameType = "USER"
-	ENTITY_ORDER   common.EntityNameType = "ORDER"
-	ENTITY_ITEM    common.EntityNameType = "ITEM"
-	ENTITY_PAYMENT common.EntityNameType = "PAYMENT"
-	ENTITY_PRODUCT common.EntityNameType = "PRODUCT"
-	ENTITY_EVENT   common.EntityNameType = "EVENT"
+	ENTITY_CITY           common.EntityNameType = "CITY"
+	ENTITY_USER           common.EntityNameType = "USER"
+	ENTITY_ORDER          common.EntityNameType = "ORDER"
+	ENTITY_ITEM           common.EntityNameType = "ITEM"
+	ENTITY_PAYMENT        common.EntityNameType = "PAYMENT"
+	ENTITY_REFUND_PAYMENT common.EntityNameType = "REFUND_PAYMENT"
+	ENTITY_PRODUCT        common.EntityNameType = "PRODUCT"
+	ENTITY_EVENT          common.EntityNameType = "EVENT"
 )
 
 const (
@@ -44,6 +45,12 @@ const (
 	PAYMENT_CONFIRMED common.StatusCode = "5202"
 	PAYMENT_CANCELLED common.StatusCode = "5203"
 	PAYMENT_TIMEOUT   common.StatusCode = "5408"
+
+	// Refund Payment status statusCode
+	REFUND_PAYMENT_INITIATED common.StatusCode = "6201"
+	REFUND_PAYMENT_CONFIRMED common.StatusCode = "6202"
+	REFUND_PAYMENT_CANCELLED common.StatusCode = "6203"
+	REFUND_PAYMENT_TIMEOUT   common.StatusCode = "6408"
 )
 
 const (

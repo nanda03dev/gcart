@@ -39,14 +39,7 @@ func SetupDatabase() *mongo.Database {
 
 	mongoURI := "mongodb://localhost:27017"
 
-	collections := []gnosql_client.CollectionInput{
-		models.CityGnosql,
-		models.ItemGnosql,
-		models.OrderGnosql,
-		models.PaymentGnosql,
-		models.ProductGnosql,
-		models.UserGnosql,
-	}
+	collections := models.GetAllGnosqlCollections()
 
 	GnoSQLDB = gnosql_client.Connect("localhost:5455", DatabaseName, true)
 

@@ -23,6 +23,7 @@ func StartCRUDWorker() {
 		var orderService = services.AppServices.Order
 		var itemService = services.AppServices.Item
 		var paymentService = services.AppServices.Payment
+		var refundPaymentService = services.AppServices.RefundPayment
 
 		event := models.Event{
 			EntityId:      crudEvent.EntityId,
@@ -66,6 +67,11 @@ func StartCRUDWorker() {
 			{
 				payment, _ := paymentService.GetPaymentByID(event.EntityId)
 				docmentToCreate = payment.ToDocument()
+			}
+		case global_constant.ENTITY_REFUND_PAYMENT:
+			{
+				refundPayment, _ := refundPaymentService.GetRefundPaymentByID(event.EntityId)
+				docmentToCreate = refundPayment.ToDocument()
 			}
 		}
 

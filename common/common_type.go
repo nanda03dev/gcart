@@ -26,6 +26,10 @@ type PaymentConfirmBody struct {
 	PaymentId string `json:"paymentId"`
 }
 
+type RefundPaymentConfirmBody struct {
+	RefundPaymentId string `json:"refundPaymentId"`
+}
+
 type EntityNameType string
 type OperationType string
 type StatusCode string

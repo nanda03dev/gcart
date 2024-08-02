@@ -8,6 +8,7 @@ import (
 func InitiateWorker() {
 	go startWorkerWithRecovery(StartCRUDWorker)
 	go startWorkerWithRecovery(StartEntityTimeoutWorker)
+	go startWorkerWithRecovery(StartPaymentRefundWorker)
 }
 
 func startWorkerWithRecovery(workerFunc func()) {

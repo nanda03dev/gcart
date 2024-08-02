@@ -44,7 +44,7 @@ func (payment Payment) ToEvent(operationType common.OperationType) common.EventT
 		EntityId:      payment.DocId,
 		EntityType:    global_constant.ENTITY_PAYMENT,
 		OperationType: operationType,
-		CheckProcess:  GetCheckProcess(global_constant.ENTITY_ORDER, operationType),
+		CheckProcess:  GetCheckProcess(global_constant.ENTITY_PAYMENT, operationType),
 	}
 }
 

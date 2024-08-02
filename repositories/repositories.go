@@ -6,25 +6,27 @@ import (
 )
 
 type Repositories struct {
-	City    *CityRepository
-	User    *UserRepository
-	Order   *OrderRepository
-	Item    *ItemRepository
-	Product *ProductRepository
-	Payment *PaymentRepository
-	Event   *EventRepository
+	City          *CityRepository
+	User          *UserRepository
+	Product       *ProductRepository
+	Order         *OrderRepository
+	Item          *ItemRepository
+	Payment       *PaymentRepository
+	RefundPayment *RefundPaymentRepository
+	Event         *EventRepository
 }
 
 var AppRepositories Repositories
 
 func InitializeRepositories(db *mongo.Database) {
 	AppRepositories = Repositories{
-		City:    NewCityRepository(config.DB),
-		User:    NewUserRepository(config.DB),
-		Order:   NewOrderRepository(config.DB),
-		Item:    NewItemRepository(config.DB),
-		Product: NewProductRepository(config.DB),
-		Payment: NewPaymentRepository(config.DB),
-		Event:   NewEventRepository(config.DB),
+		City:          NewCityRepository(config.DB),
+		User:          NewUserRepository(config.DB),
+		Product:       NewProductRepository(config.DB),
+		Order:         NewOrderRepository(config.DB),
+		Item:          NewItemRepository(config.DB),
+		Payment:       NewPaymentRepository(config.DB),
+		RefundPayment: NewRefundPaymentRepository(config.DB),
+		Event:         NewEventRepository(config.DB),
 	}
 }

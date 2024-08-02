@@ -14,6 +14,18 @@ func Generate16DigitUUID() string {
 	return uuidObj.String()
 }
 
+func GetAllGnosqlCollections() []gnosql_client.CollectionInput {
+	return []gnosql_client.CollectionInput{
+		CityGnosql,
+		UserGnosql,
+		ProductGnosql,
+		OrderGnosql,
+		ItemGnosql,
+		PaymentGnosql,
+		RefundPaymentGnosql,
+	}
+}
+
 func GetGnosqlCollection(entityType common.EntityNameType) gnosql_client.CollectionInput {
 	switch entityType {
 	case global_constant.ENTITY_CITY:
@@ -28,6 +40,8 @@ func GetGnosqlCollection(entityType common.EntityNameType) gnosql_client.Collect
 		return ItemGnosql
 	case global_constant.ENTITY_PAYMENT:
 		return PaymentGnosql
+	case global_constant.ENTITY_REFUND_PAYMENT:
+		return RefundPaymentGnosql
 
 	default:
 		return gnosql_client.CollectionInput{}
@@ -43,6 +57,7 @@ func IsRequireToStoreEvent(entityType common.EntityNameType) bool {
 		return false
 	case global_constant.ENTITY_ORDER,
 		global_constant.ENTITY_PAYMENT,
+		global_constant.ENTITY_REFUND_PAYMENT,
 		global_constant.ENTITY_CITY:
 		return true
 	default:
@@ -57,7 +72,8 @@ func IsEventTimeExpired(entityType common.EntityNameType, eventCreatedAt time.Ti
 	case global_constant.ENTITY_CITY,
 		global_constant.ENTITY_USER,
 		global_constant.ENTITY_PRODUCT,
-		global_constant.ENTITY_ITEM:
+		global_constant.ENTITY_ITEM,
+		global_constant.ENTITY_REFUND_PAYMENT:
 		return false
 	case global_constant.ENTITY_ORDER:
 		expireTime = eventCreatedAt.Add(2 * time.Minute)
@@ -77,6 +93,7 @@ func GetCheckProcess(entityType common.EntityNameType, operationType common.Oper
 	case global_constant.ENTITY_CITY,
 		global_constant.ENTITY_USER,
 		global_constant.ENTITY_PRODUCT,
+		global_constant.ENTITY_REFUND_PAYMENT,
 		global_constant.ENTITY_ITEM:
 		return ""
 	}

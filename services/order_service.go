@@ -132,6 +132,7 @@ func (s *orderService) ConfirmOrder(orderConfirmBody common.OrderConfirmBody) er
 
 	event := order.ToEvent(global_constant.OPERATION_CONFIRMED)
 	common.AddToChanCRUD(event)
+	common.AddToChanPaymentRefund(event)
 
 	return updateError
 }

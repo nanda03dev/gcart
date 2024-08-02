@@ -86,3 +86,18 @@ func (c *PaymentController) DeletePayment(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_DELETED_SUCCESSFULLY, nil))
 }
+
+func (c *PaymentController) ConfirmPayment(ctx *gin.Context) {
+	var paymentConfirmBody common.PaymentConfirmBody
+
+	if err := ctx.ShouldBindJSON(&paymentConfirmBody); err != nil {
+		ctx.JSON(http.StatusBadRequest, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
+		return
+	}
+
+	if err := c.paymentService.ConfirmPayment(paymentConfirmBody); err != nil {
+		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
+		return
+	}
+	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_CONFIRMED_SUCCESSFULLY, nil))
+}

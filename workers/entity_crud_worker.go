@@ -76,6 +76,7 @@ func StartCRUDWorker() {
 				entityGnosql.Create(docmentToCreate)
 			}
 		case global_constant.OPERATION_UPDATE:
+		case global_constant.OPERATION_CONFIRMED:
 			{
 				entityGnosql.Update(event.EntityId, docmentToCreate)
 			}

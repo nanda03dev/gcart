@@ -33,6 +33,7 @@ func InitializeRouter() *gin.Engine {
 		orderRoutes.GET("/:id", orderController.GetOrderByID)
 		orderRoutes.PUT("/:id", orderController.UpdateOrder)
 		orderRoutes.DELETE("/:id", orderController.DeleteOrder)
+		orderRoutes.POST("/confirm", orderController.ConfirmOrder)
 	}
 
 	cityRoutes := router.Group("/cities")
@@ -60,6 +61,7 @@ func InitializeRouter() *gin.Engine {
 		paymentsRoutes.GET("/:id", paymentController.GetPaymentByID)
 		paymentsRoutes.PUT("/:id", paymentController.UpdatePayment)
 		paymentsRoutes.DELETE("/:id", paymentController.DeletePayment)
+		paymentsRoutes.POST("/confirm", paymentController.ConfirmPayment)
 	}
 
 	itemRoutes := router.Group("/items")

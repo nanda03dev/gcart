@@ -60,9 +60,9 @@ func IsEventTimeExpired(entityType common.EntityNameType, eventCreatedAt time.Ti
 		global_constant.ENTITY_ITEM:
 		return false
 	case global_constant.ENTITY_ORDER:
-		expireTime = eventCreatedAt.Add(60 * time.Second)
+		expireTime = eventCreatedAt.Add(2 * time.Minute)
 	case global_constant.ENTITY_PAYMENT:
-		expireTime = eventCreatedAt.Add(30 * time.Second)
+		expireTime = eventCreatedAt.Add(1 * time.Minute)
 	}
 
 	return time.Now().After(expireTime)

@@ -22,6 +22,10 @@ type OrderConfirmBody struct {
 	OrderId string `json:"orderId"`
 }
 
+type PaymentConfirmBody struct {
+	PaymentId string `json:"paymentId"`
+}
+
 type EntityNameType string
 type OperationType string
 type StatusCode string

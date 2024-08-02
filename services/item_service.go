@@ -34,6 +34,10 @@ func (s *itemService) CreateItem(item models.Item) (models.Item, error) {
 	item.StatusCode = global_constant.ITEM_INITIATED
 	createError := s.itemRepository.Create(context.Background(), item)
 
+	order, _ := AppServices.Order.GetOrderByID(item.OrderId)
+	order.Amount = order.Amount + item.Amount
+	AppServices.Order.UpdateOrder(order)
+
 	event := item.ToEvent(global_constant.OPERATION_CREATE)
 	common.AddToChanCRUD(event)
 

@@ -19,6 +19,7 @@ type PaymentService interface {
 	UpdatePaymentTimeout(docId string) bool
 	DeletePayment(docId string) error
 	DeleteOrderPayments(orderId string) error
+	ConfirmPayment(paymentConfirmBody common.PaymentConfirmBody) error
 }
 
 type paymentService struct {
@@ -110,4 +111,20 @@ func (s *paymentService) DeleteOrderPayments(orderId string) error {
 		common.AddToChanCRUD(event)
 	}
 	return deleteError
+}
+
+func (s *paymentService) ConfirmPayment(paymentConfirmBody common.PaymentConfirmBody) error {
+	payment, getByError := s.paymentRepository.GetByID(context.TODO(), paymentConfirmBody.PaymentId)
+
+	if getByError == nil && payment.StatusCode == global_constant.PAYMENT_INITIATED {
+
+		payment.StatusCode = global_constant.PAYMENT_CONFIRMED
+		confirmError := s.paymentRepository.Update(context.TODO(), payment.DocId, payment)
+
+		event := payment.ToEvent(global_constant.OPERATION_CONFIRMED)
+		common.AddToChanCRUD(event)
+		return confirmError
+	}
+
+	return getByError
 }

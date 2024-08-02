@@ -10,8 +10,8 @@ import (
 )
 
 func Generate16DigitUUID() string {
-	uuidObj := uuid.New()
-	return uuidObj.String()
+	id, _ := uuid.NewUUID()
+	return id.String()
 }
 
 func GetAllGnosqlCollections() []gnosql_client.CollectionInput {

@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 
-	"github.com/nanda03dev/go2ms/common"
+	"github.com/nanda03dev/gcart/common"
 )
 
 type Event struct {

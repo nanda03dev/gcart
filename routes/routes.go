@@ -2,8 +2,8 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/nanda03dev/go2ms/controllers"
-	"github.com/nanda03dev/go2ms/services"
+	"github.com/nanda03dev/gcart/controllers"
+	"github.com/nanda03dev/gcart/services"
 )
 
 func InitializeRouter() *gin.Engine {

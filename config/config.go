@@ -9,8 +9,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/nanda03dev/gcart/models"
 	"github.com/nanda03dev/gnosql_client"
-	"github.com/nanda03dev/go2ms/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -35,7 +35,7 @@ func LoadConfig() {
 }
 
 func SetupDatabase() *mongo.Database {
-	DatabaseName := "go2ms"
+	DatabaseName := "gcart"
 
 	mongoURI := "mongodb://localhost:27017"
 
@@ -66,6 +66,6 @@ func SetupDatabase() *mongo.Database {
 
 	fmt.Println("Pinged your deployment. You successfully connected to MongoDB!")
 
-	DB = client.Database("go2ms")
+	DB = client.Database("gcart")
 	return DB
 }

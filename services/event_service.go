@@ -3,9 +3,9 @@ package services
 import (
 	"context"
 
-	"github.com/nanda03dev/go2ms/common"
-	"github.com/nanda03dev/go2ms/models"
-	"github.com/nanda03dev/go2ms/repositories"
+	"github.com/nanda03dev/gcart/common"
+	"github.com/nanda03dev/gcart/models"
+	"github.com/nanda03dev/gcart/repositories"
 )
 
 type EventService interface {

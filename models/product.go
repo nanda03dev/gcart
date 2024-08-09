@@ -1,9 +1,11 @@
 package models
 
 import (
+	"encoding/json"
+
+	"github.com/nanda03dev/gcart/common"
+	"github.com/nanda03dev/gcart/global_constant"
 	"github.com/nanda03dev/gnosql_client"
-	"github.com/nanda03dev/go2ms/common"
-	"github.com/nanda03dev/go2ms/global_constant"
 )
 
 type Product struct {
@@ -27,13 +29,20 @@ func (product Product) ToDocument() gnosql_client.Document {
 	}
 }
 
-func (product Product) ToModel(productDocument gnosql_client.Document) Product {
-	return Product{
-		DocId:  GetStringValue(productDocument, "docId"),
-		Name:   GetStringValue(productDocument, "name"),
-		Amount: GetIntegerValue(productDocument, "amount"),
-		Status: GetValue[common.StatusCode](productDocument, "statusCode"),
-	}
+func (product Product) ToModel(entityDocument gnosql_client.Document) Product {
+	entityString, _ := json.Marshal(entityDocument)
+
+	var parsedEntity Product
+	json.Unmarshal(entityString, &parsedEntity)
+
+	return parsedEntity
+
+	// return Product{
+	// 	DocId:  GetStringValue(productDocument, "docId"),
+	// 	Name:   GetStringValue(productDocument, "name"),
+	// 	Amount: GetIntegerValue(productDocument, "amount"),
+	// 	Status: GetValue[common.StatusCode](productDocument, "statusCode"),
+	// }
 }
 
 func (product Product) ToEvent(operationType common.OperationType) common.EventType {

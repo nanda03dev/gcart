@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"github.com/nanda03dev/go2ms/models"
+	"github.com/nanda03dev/gcart/models"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 

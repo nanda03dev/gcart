@@ -1,9 +1,11 @@
 package models
 
 import (
+	"encoding/json"
+
+	"github.com/nanda03dev/gcart/common"
+	"github.com/nanda03dev/gcart/global_constant"
 	"github.com/nanda03dev/gnosql_client"
-	"github.com/nanda03dev/go2ms/common"
-	"github.com/nanda03dev/go2ms/global_constant"
 )
 
 type Payment struct {
@@ -29,14 +31,21 @@ func (payment Payment) ToDocument() gnosql_client.Document {
 	}
 }
 
-func (payment Payment) ToModel(paymentDocument gnosql_client.Document) Payment {
-	return Payment{
-		DocId:      GetStringValue(paymentDocument, "docId"),
-		OrderId:    GetStringValue(paymentDocument, "orderId"),
-		Name:       GetStringValue(paymentDocument, "name"),
-		Amount:     GetIntegerValue(paymentDocument, "amount"),
-		StatusCode: GetValue[common.StatusCode](paymentDocument, "statusCode"),
-	}
+func (payment Payment) ToModel(entityDocument gnosql_client.Document) Payment {
+	entityString, _ := json.Marshal(entityDocument)
+
+	var parsedEntity Payment
+	json.Unmarshal(entityString, &parsedEntity)
+
+	return parsedEntity
+
+	// return Payment{
+	// 	DocId:      GetStringValue(paymentDocument, "docId"),
+	// 	OrderId:    GetStringValue(paymentDocument, "orderId"),
+	// 	Name:       GetStringValue(paymentDocument, "name"),
+	// 	Amount:     GetIntegerValue(paymentDocument, "amount"),
+	// 	StatusCode: GetValue[common.StatusCode](paymentDocument, "statusCode"),
+	// }
 }
 
 func (payment Payment) ToEvent(operationType common.OperationType) common.EventType {

@@ -4,9 +4,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/nanda03dev/gcart/common"
+	"github.com/nanda03dev/gcart/global_constant"
 	"github.com/nanda03dev/gnosql_client"
-	"github.com/nanda03dev/go2ms/common"
-	"github.com/nanda03dev/go2ms/global_constant"
 )
 
 func Generate16DigitUUID() string {

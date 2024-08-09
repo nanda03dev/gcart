@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 
-	"github.com/nanda03dev/go2ms/common"
-	"github.com/nanda03dev/go2ms/global_constant"
-	"github.com/nanda03dev/go2ms/models"
-	"github.com/nanda03dev/go2ms/repositories"
+	"github.com/nanda03dev/gcart/common"
+	"github.com/nanda03dev/gcart/global_constant"
+	"github.com/nanda03dev/gcart/models"
+	"github.com/nanda03dev/gcart/repositories"
 )
 
 type OrderService interface {
@@ -71,6 +71,7 @@ func (s *orderService) UpdateOrderTimeout(docId string) bool {
 
 		event := order.ToEvent(global_constant.OPERATION_UPDATE)
 		common.AddToChanCRUD(event)
+		common.AddToChanPaymentRefund(event)
 		return true
 	}
 

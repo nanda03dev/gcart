@@ -4,12 +4,12 @@ import (
 	"log"
 	"os"
 
-	"github.com/nanda03dev/go2ms/common"
-	"github.com/nanda03dev/go2ms/config"
-	"github.com/nanda03dev/go2ms/repositories"
-	"github.com/nanda03dev/go2ms/routes"
-	"github.com/nanda03dev/go2ms/services"
-	"github.com/nanda03dev/go2ms/workers"
+	"github.com/nanda03dev/gcart/common"
+	"github.com/nanda03dev/gcart/config"
+	"github.com/nanda03dev/gcart/repositories"
+	"github.com/nanda03dev/gcart/routes"
+	"github.com/nanda03dev/gcart/services"
+	"github.com/nanda03dev/gcart/workers"
 )
 
 func main() {

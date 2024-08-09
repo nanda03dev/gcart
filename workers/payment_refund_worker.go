@@ -1,10 +1,10 @@
 package workers
 
 import (
-	"github.com/nanda03dev/go2ms/common"
-	"github.com/nanda03dev/go2ms/global_constant"
-	"github.com/nanda03dev/go2ms/models"
-	"github.com/nanda03dev/go2ms/services"
+	"github.com/nanda03dev/gcart/common"
+	"github.com/nanda03dev/gcart/global_constant"
+	"github.com/nanda03dev/gcart/models"
+	"github.com/nanda03dev/gcart/services"
 )
 
 func StartPaymentRefundWorker() {
@@ -17,7 +17,7 @@ func StartPaymentRefundWorker() {
 
 		order, _ := orderService.GetOrderByID(crudEvent.EntityId)
 
-		if order.StatusCode != global_constant.ORDER_CONFIRMED {
+		if order.StatusCode != global_constant.ORDER_CONFIRMED && order.StatusCode != global_constant.ORDER_TIMEOUT {
 			return
 		}
 
@@ -31,7 +31,13 @@ func StartPaymentRefundWorker() {
 				paymentTotalAmount = paymentTotalAmount + payment.Amount
 			}
 		}
-		refundAmount := paymentTotalAmount - orderAmount
+		var refundAmount = 0
+
+		if order.StatusCode == global_constant.ORDER_CONFIRMED {
+			refundAmount = paymentTotalAmount - orderAmount
+		} else {
+			refundAmount = paymentTotalAmount
+		}
 
 		if refundAmount < 1 {
 			return

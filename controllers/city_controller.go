@@ -1,13 +1,14 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/nanda03dev/go2ms/common"
-	"github.com/nanda03dev/go2ms/global_constant"
-	"github.com/nanda03dev/go2ms/models"
-	"github.com/nanda03dev/go2ms/services"
+	"github.com/nanda03dev/gcart/common"
+	"github.com/nanda03dev/gcart/global_constant"
+	"github.com/nanda03dev/gcart/models"
+	"github.com/nanda03dev/gcart/services"
 )
 
 type CityController struct {
@@ -61,10 +62,13 @@ func (c *CityController) GetCityByID(ctx *gin.Context) {
 
 func (c *CityController) UpdateCity(ctx *gin.Context) {
 	var city models.City
+
 	if err := ctx.ShouldBindJSON(&city); err != nil {
 		ctx.JSON(http.StatusBadRequest, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
+	fmt.Printf("\n controller city %v ", city)
+
 	city.DocId = ctx.Param("id")
 	if err := c.cityService.UpdateCity(city); err != nil {
 		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))

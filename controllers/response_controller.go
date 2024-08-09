@@ -1,6 +1,6 @@
 package controllers
 
-import "github.com/nanda03dev/go2ms/common"
+import "github.com/nanda03dev/gcart/common"
 
 func ToSuccessResponse(msg any, data any) common.SuccessResponse {
 	return common.SuccessResponse{

@@ -3,8 +3,8 @@ package repositories
 import (
 	"context"
 
-	"github.com/nanda03dev/go2ms/common"
-	"github.com/nanda03dev/go2ms/models"
+	"github.com/nanda03dev/gcart/common"
+	"github.com/nanda03dev/gcart/models"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 

@@ -1,7 +1,7 @@
 package global_constant
 
 import (
-	"github.com/nanda03dev/go2ms/common"
+	"github.com/nanda03dev/gcart/common"
 )
 
 const (

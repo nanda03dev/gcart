@@ -1,8 +1,8 @@
 package services
 
 import (
-	"github.com/nanda03dev/go2ms/config"
-	"github.com/nanda03dev/go2ms/repositories"
+	"github.com/nanda03dev/gcart/config"
+	"github.com/nanda03dev/gcart/repositories"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 

@@ -1,9 +1,11 @@
 package models
 
 import (
+	"encoding/json"
+
+	"github.com/nanda03dev/gcart/common"
+	"github.com/nanda03dev/gcart/global_constant"
 	"github.com/nanda03dev/gnosql_client"
-	"github.com/nanda03dev/go2ms/common"
-	"github.com/nanda03dev/go2ms/global_constant"
 )
 
 type Order struct {
@@ -27,13 +29,20 @@ func (order Order) ToDocument() gnosql_client.Document {
 	}
 }
 
-func (order Order) ToModel(orderDocument gnosql_client.Document) Order {
-	return Order{
-		DocId:      GetStringValue(orderDocument, "docId"),
-		Amount:     GetIntegerValue(orderDocument, "amount"),
-		UserID:     GetStringValue(orderDocument, "userId"),
-		StatusCode: GetValue[common.StatusCode](orderDocument, "statusCode"),
-	}
+func (order Order) ToModel(entityDocument gnosql_client.Document) Order {
+	entityString, _ := json.Marshal(entityDocument)
+
+	var parsedEntity Order
+	json.Unmarshal(entityString, &parsedEntity)
+
+	return parsedEntity
+
+	// return Order{
+	// 	DocId:      GetStringValue(orderDocument, "docId"),
+	// 	Amount:     GetIntegerValue(orderDocument, "amount"),
+	// 	UserID:     GetStringValue(orderDocument, "userId"),
+	// 	StatusCode: GetValue[common.StatusCode](orderDocument, "statusCode"),
+	// }
 }
 
 func (order Order) ToEvent(operationType common.OperationType) common.EventType {

@@ -1,9 +1,11 @@
 package models
 
 import (
+	"encoding/json"
+
+	"github.com/nanda03dev/gcart/common"
+	"github.com/nanda03dev/gcart/global_constant"
 	"github.com/nanda03dev/gnosql_client"
-	"github.com/nanda03dev/go2ms/common"
-	"github.com/nanda03dev/go2ms/global_constant"
 )
 
 type RefundPayment struct {
@@ -29,14 +31,21 @@ func (refundPayment RefundPayment) ToDocument() gnosql_client.Document {
 	}
 }
 
-func (refundPayment RefundPayment) ToModel(refundPaymentDocument gnosql_client.Document) RefundPayment {
-	return RefundPayment{
-		DocId:      GetStringValue(refundPaymentDocument, "docId"),
-		OrderId:    GetStringValue(refundPaymentDocument, "orderId"),
-		Name:       GetStringValue(refundPaymentDocument, "name"),
-		Amount:     GetIntegerValue(refundPaymentDocument, "amount"),
-		StatusCode: GetValue[common.StatusCode](refundPaymentDocument, "statusCode"),
-	}
+func (refundPayment RefundPayment) ToModel(entityDocument gnosql_client.Document) RefundPayment {
+	entityString, _ := json.Marshal(entityDocument)
+
+	var parsedEntity RefundPayment
+	json.Unmarshal(entityString, &parsedEntity)
+
+	return parsedEntity
+
+	// return RefundPayment{
+	// 	DocId:      GetStringValue(refundPaymentDocument, "docId"),
+	// 	OrderId:    GetStringValue(refundPaymentDocument, "orderId"),
+	// 	Name:       GetStringValue(refundPaymentDocument, "name"),
+	// 	Amount:     GetIntegerValue(refundPaymentDocument, "amount"),
+	// 	StatusCode: GetValue[common.StatusCode](refundPaymentDocument, "statusCode"),
+	// }
 }
 
 func (refundPayment RefundPayment) ToEvent(operationType common.OperationType) common.EventType {

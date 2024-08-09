@@ -1,9 +1,11 @@
 package models
 
 import (
+	"encoding/json"
+
+	"github.com/nanda03dev/gcart/common"
+	"github.com/nanda03dev/gcart/global_constant"
 	"github.com/nanda03dev/gnosql_client"
-	"github.com/nanda03dev/go2ms/common"
-	"github.com/nanda03dev/go2ms/global_constant"
 )
 
 type City struct {
@@ -18,11 +20,12 @@ var CityGnosql = gnosql_client.CollectionInput{
 }
 
 func (city City) ToModel(cityDocument gnosql_client.Document) City {
-	return City{
-		DocId:       GetStringValue(cityDocument, "docId"),
-		Name:        GetStringValue(cityDocument, "name"),
-		CountryCode: GetStringValue(cityDocument, "countryCode"),
-	}
+	cityString, _ := json.Marshal(cityDocument)
+
+	var parsedEntity City
+	json.Unmarshal(cityString, &parsedEntity)
+
+	return parsedEntity
 }
 
 func (city City) ToDocument() gnosql_client.Document {

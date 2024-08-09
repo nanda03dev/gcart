@@ -1,9 +1,11 @@
 package models
 
 import (
+	"encoding/json"
+
+	"github.com/nanda03dev/gcart/common"
+	"github.com/nanda03dev/gcart/global_constant"
 	"github.com/nanda03dev/gnosql_client"
-	"github.com/nanda03dev/go2ms/common"
-	"github.com/nanda03dev/go2ms/global_constant"
 )
 
 type User struct {
@@ -29,14 +31,21 @@ func (user User) ToDocument() gnosql_client.Document {
 	}
 }
 
-func (user User) ToModel(userDocument gnosql_client.Document) User {
-	return User{
-		DocId:   GetStringValue(userDocument, "docId"),
-		Name:    GetStringValue(userDocument, "name"),
-		Email:   GetStringValue(userDocument, "email"),
-		Address: GetStringValue(userDocument, "address"),
-		CityID:  GetStringValue(userDocument, "cityId"),
-	}
+func (user User) ToModel(entityDocument gnosql_client.Document) User {
+	entityString, _ := json.Marshal(entityDocument)
+
+	var parsedEntity User
+	json.Unmarshal(entityString, &parsedEntity)
+
+	return parsedEntity
+
+	// return User{
+	// 	DocId:   GetStringValue(userDocument, "docId"),
+	// 	Name:    GetStringValue(userDocument, "name"),
+	// 	Email:   GetStringValue(userDocument, "email"),
+	// 	Address: GetStringValue(userDocument, "address"),
+	// 	CityID:  GetStringValue(userDocument, "cityId"),
+	// }
 }
 
 func (user User) ToEvent(operationType common.OperationType) common.EventType {

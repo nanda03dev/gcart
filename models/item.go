@@ -1,9 +1,11 @@
 package models
 
 import (
+	"encoding/json"
+
+	"github.com/nanda03dev/gcart/common"
+	"github.com/nanda03dev/gcart/global_constant"
 	"github.com/nanda03dev/gnosql_client"
-	"github.com/nanda03dev/go2ms/common"
-	"github.com/nanda03dev/go2ms/global_constant"
 )
 
 type Item struct {
@@ -19,14 +21,21 @@ var ItemGnosql = gnosql_client.CollectionInput{
 	IndexKeys:      []string{},
 }
 
-func (item Item) ToModel(itemDocument gnosql_client.Document) Item {
-	return Item{
-		DocId:      GetStringValue(itemDocument, "docId"),
-		OrderId:    GetStringValue(itemDocument, "orderId"),
-		ProductId:  GetStringValue(itemDocument, "productId"),
-		Amount:     GetIntegerValue(itemDocument, "amount"),
-		StatusCode: GetValue[common.StatusCode](itemDocument, "statusCode"),
-	}
+func (item Item) ToModel(entityDocument gnosql_client.Document) Item {
+	entityString, _ := json.Marshal(entityDocument)
+
+	var parsedEntity Item
+	json.Unmarshal(entityString, &parsedEntity)
+
+	return parsedEntity
+
+	// return Item{
+	// 	DocId:      GetStringValue(itemDocument, "docId"),
+	// 	OrderId:    GetStringValue(itemDocument, "orderId"),
+	// 	ProductId:  GetStringValue(itemDocument, "productId"),
+	// 	Amount:     GetIntegerValue(itemDocument, "amount"),
+	// 	StatusCode: GetValue[common.StatusCode](itemDocument, "statusCode"),
+	// }
 }
 
 func (item Item) ToDocument() gnosql_client.Document {

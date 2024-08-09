@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -11,76 +10,76 @@ import (
 	"github.com/nanda03dev/gcart/services"
 )
 
-type CityController struct {
-	cityService services.CityService
+type EventController struct {
+	eventService services.EventService
 }
 
-func NewCityController(cityService services.CityService) *CityController {
-	return &CityController{cityService}
+func NewEventController(eventService services.EventService) *EventController {
+	return &EventController{eventService}
 }
 
-func (c *CityController) CreateCity(ctx *gin.Context) {
-	var city models.City
-	if err := ctx.ShouldBindJSON(&city); err != nil {
+func (c *EventController) CreateEvent(ctx *gin.Context) {
+	var event models.Event
+	if err := ctx.ShouldBindJSON(&event); err != nil {
 		ctx.JSON(http.StatusBadRequest, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	city, err := c.cityService.CreateCity(city)
+	event, err := c.eventService.CreateEvent(event)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.JSON(http.StatusCreated, ToSuccessResponse(global_constant.ENTITY_CREATED_SUCCESSFULLY, city.DocId))
+
+	ctx.JSON(http.StatusCreated, ToSuccessResponse(global_constant.ENTITY_CREATED_SUCCESSFULLY, event.DocId))
 }
 
-func (c *CityController) GetAllCities(ctx *gin.Context) {
+func (c *EventController) GetAllEvents(ctx *gin.Context) {
 	var requestFilterBody common.RequestFilterBodyType
 	if err := ctx.ShouldBindJSON(&requestFilterBody); err != nil {
 		ctx.JSON(http.StatusBadRequest, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	cities, err := c.cityService.GetAllCities(requestFilterBody)
 
+	events, err := c.eventService.GetAllEvents(requestFilterBody)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_FETCHED_SUCCESSFULLY, cities))
+	ctx.JSON(http.StatusOK, events)
 }
 
-func (c *CityController) GetCityByID(ctx *gin.Context) {
+func (c *EventController) GetEventByID(ctx *gin.Context) {
 	idParam := ctx.Param("id")
 
-	city, err := c.cityService.GetCityByID(idParam)
+	event, err := c.eventService.GetEventByID(idParam)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_FETCHED_SUCCESSFULLY, city))
+	ctx.JSON(http.StatusOK, event)
 }
 
-func (c *CityController) UpdateCity(ctx *gin.Context) {
-	var city models.City
-
-	if err := ctx.ShouldBindJSON(&city); err != nil {
+func (c *EventController) UpdateEvent(ctx *gin.Context) {
+	var event models.Event
+	if err := ctx.ShouldBindJSON(&event); err != nil {
 		ctx.JSON(http.StatusBadRequest, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	fmt.Printf("\n controller city %v ", city)
 
-	city.DocId = ctx.Param("id")
-	if err := c.cityService.UpdateCity(city); err != nil {
+	event.DocId = ctx.Param("id")
+
+	if err := c.eventService.UpdateEvent(event); err != nil {
 		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
 	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_UPDATED_SUCCESSFULLY, nil))
 }
 
-func (c *CityController) DeleteCity(ctx *gin.Context) {
-	DocId := ctx.Param("id")
+func (c *EventController) DeleteEvent(ctx *gin.Context) {
+	idParam := ctx.Param("id")
 
-	if err := c.cityService.DeleteCity(DocId); err != nil {
+	if err := c.eventService.DeleteEvent(idParam); err != nil {
 		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}

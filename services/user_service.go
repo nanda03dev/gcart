@@ -2,18 +2,20 @@ package services
 
 import (
 	"context"
+	"errors"
 
-	"github.com/nanda03dev/go2ms/models"
-	"github.com/nanda03dev/go2ms/repositories"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"github.com/nanda03dev/gcart/common"
+	"github.com/nanda03dev/gcart/global_constant"
+	"github.com/nanda03dev/gcart/models"
+	"github.com/nanda03dev/gcart/repositories"
 )
 
 type UserService interface {
-	CreateUser(user models.User) error
-	GetAllUsers() ([]models.User, error)
-	GetUserByID(id string) (models.User, error)
+	CreateUser(user models.User) (models.User, error)
+	GetAllUsers(requestFilterBody common.RequestFilterBodyType) ([]models.User, error)
+	GetUserByID(docId string) (models.User, error)
 	UpdateUser(user models.User) error
-	DeleteUser(id string) error
+	DeleteUser(docId string) error
 }
 
 type userService struct {
@@ -24,31 +26,49 @@ func NewUserService(userRepository *repositories.UserRepository) UserService {
 	return &userService{userRepository}
 }
 
-func (s *userService) CreateUser(user models.User) error {
-	return s.userRepository.Create(context.Background(), user)
+func (s *userService) CreateUser(user models.User) (models.User, error) {
+	user.DocId = models.Generate16DigitUUID()
+	createError := s.userRepository.Create(context.Background(), user)
+
+	event := user.ToEvent(global_constant.OPERATION_CREATE)
+	common.AddToChanCRUD(event)
+
+	return user, createError
 }
 
-func (s *userService) GetAllUsers() ([]models.User, error) {
-	return s.userRepository.GetAll(context.Background(), nil)
+func (s *userService) GetAllUsers(requestFilterBody common.RequestFilterBodyType) ([]models.User, error) {
+	return s.userRepository.GetAll(context.Background(), requestFilterBody.ListOfFilter, requestFilterBody.SortBody, requestFilterBody.Size)
 }
 
-func (s *userService) GetUserByID(id string) (models.User, error) {
-	objectId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return models.User{}, err
+func (s *userService) GetUserByID(docId string) (models.User, error) {
+	return s.userRepository.GetByID(context.Background(), docId)
+}
+
+func (s *userService) UpdateUser(updateUser models.User) error {
+	user, getByIdError := s.userRepository.GetByID(context.Background(), updateUser.DocId)
+
+	if getByIdError != nil {
+		return errors.New(global_constant.ERROR_ENTITY_NOT_FOUND)
 	}
 
-	return s.userRepository.GetByID(context.Background(), objectId)
+	updateError := s.userRepository.Update(context.Background(), user.DocId, user.ToUpdatedDocument(updateUser))
+
+	event := user.ToEvent(global_constant.OPERATION_UPDATE)
+	common.AddToChanCRUD(event)
+
+	return updateError
 }
 
-func (s *userService) UpdateUser(user models.User) error {
-	return s.userRepository.Update(context.Background(), user.ID, user)
-}
+func (s *userService) DeleteUser(docId string) error {
+	user, getByIdError := s.userRepository.GetByID(context.Background(), docId)
 
-func (s *userService) DeleteUser(id string) error {
-	objectId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return err
+	if getByIdError != nil {
+		return errors.New(global_constant.ERROR_ENTITY_NOT_FOUND)
 	}
-	return s.userRepository.Delete(context.Background(), objectId)
+	deleteError := s.userRepository.Delete(context.Background(), docId)
+
+	event := user.ToEvent(global_constant.OPERATION_DELETE)
+	common.AddToChanCRUD(event)
+
+	return deleteError
 }

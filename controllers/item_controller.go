@@ -4,9 +4,10 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/nanda03dev/go2ms/models"
-	"github.com/nanda03dev/go2ms/services"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"github.com/nanda03dev/gcart/common"
+	"github.com/nanda03dev/gcart/global_constant"
+	"github.com/nanda03dev/gcart/models"
+	"github.com/nanda03dev/gcart/services"
 )
 
 type ItemController struct {
@@ -20,24 +21,31 @@ func NewItemController(itemService services.ItemService) *ItemController {
 func (c *ItemController) CreateItem(ctx *gin.Context) {
 	var item models.Item
 	if err := ctx.ShouldBindJSON(&item); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	item.ID = primitive.NewObjectID()
-	if err := c.itemService.CreateItem(item); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	item, err := c.itemService.CreateItem(item)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.JSON(http.StatusCreated, item)
+	ctx.JSON(http.StatusCreated, ToSuccessResponse(global_constant.ENTITY_CREATED_SUCCESSFULLY, item.DocId))
 }
 
 func (c *ItemController) GetAllItems(ctx *gin.Context) {
-	items, err := c.itemService.GetAllCities()
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	var requestFilterBody common.RequestFilterBodyType
+	if err := ctx.ShouldBindJSON(&requestFilterBody); err != nil {
+		ctx.JSON(http.StatusBadRequest, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.JSON(http.StatusOK, items)
+
+	items, err := c.itemService.GetAllItems(requestFilterBody)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
+		return
+	}
+	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_FETCHED_SUCCESSFULLY, items))
 }
 
 func (c *ItemController) GetItemByID(ctx *gin.Context) {
@@ -45,33 +53,34 @@ func (c *ItemController) GetItemByID(ctx *gin.Context) {
 
 	item, err := c.itemService.GetItemByID(idParam)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.JSON(http.StatusOK, item)
+	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_FETCHED_SUCCESSFULLY, item))
 }
 
 func (c *ItemController) UpdateItem(ctx *gin.Context) {
 	var item models.Item
 	if err := ctx.ShouldBindJSON(&item); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	idParam := ctx.Param("id")
-	item.ID, _ = primitive.ObjectIDFromHex(idParam)
+
+	item.DocId = ctx.Param("id")
+
 	if err := c.itemService.UpdateItem(item); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.JSON(http.StatusOK, item)
+	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_UPDATED_SUCCESSFULLY, nil))
 }
 
 func (c *ItemController) DeleteItem(ctx *gin.Context) {
 	idParam := ctx.Param("id")
 
 	if err := c.itemService.DeleteItem(idParam); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_DELETED_SUCCESSFULLY, nil))
 }

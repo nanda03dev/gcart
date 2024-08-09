@@ -1,11 +1,20 @@
-module github.com/nanda03dev/go2ms
+module github.com/nanda03dev/gcart
 
-go 1.21.5
+go 1.22.5
 
 require (
 	github.com/gin-gonic/gin v1.10.0
+	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
+	github.com/nanda03dev/gnosql_client v1.0.5
+	github.com/nanda03dev/gque_client v1.0.3
 	go.mongodb.org/mongo-driver v1.16.0
+)
+
+require (
+	github.com/go-resty/resty/v2 v2.10.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240730163845-b1a4ccb954bf // indirect
+	google.golang.org/grpc v1.65.0 // indirect
 )
 
 require (
@@ -36,10 +45,10 @@ require (
 	github.com/xdg-go/stringprep v1.0.4 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d // indirect
 	golang.org/x/arch v0.8.0 // indirect
-	golang.org/x/crypto v0.24.0 // indirect
-	golang.org/x/net v0.26.0 // indirect
+	golang.org/x/crypto v0.25.0 // indirect
+	golang.org/x/net v0.27.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.21.0 // indirect
+	golang.org/x/sys v0.22.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

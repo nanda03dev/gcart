@@ -10,92 +10,92 @@ import (
 	"github.com/nanda03dev/gcart/services"
 )
 
-type OrderController struct {
-	orderService services.OrderService
+type RefundPaymentController struct {
+	refundPaymentService services.RefundPaymentService
 }
 
-func NewOrderController(orderService services.OrderService) *OrderController {
-	return &OrderController{orderService}
+func NewRefundPaymentController(refundPaymentService services.RefundPaymentService) *RefundPaymentController {
+	return &RefundPaymentController{refundPaymentService}
 }
 
-func (c *OrderController) CreateOrder(ctx *gin.Context) {
-	var order models.Order
-	if err := ctx.ShouldBindJSON(&order); err != nil {
+func (c *RefundPaymentController) CreateRefundPayment(ctx *gin.Context) {
+	var refundPayment models.RefundPayment
+	if err := ctx.ShouldBindJSON(&refundPayment); err != nil {
 		ctx.JSON(http.StatusBadRequest, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	order, err := c.orderService.CreateOrder(order)
+	refundPayment, err := c.refundPaymentService.CreateRefundPayment(refundPayment)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, ToSuccessResponse(global_constant.ENTITY_CREATED_SUCCESSFULLY, order.DocId))
+	ctx.JSON(http.StatusCreated, ToSuccessResponse(global_constant.ENTITY_CREATED_SUCCESSFULLY, refundPayment.DocId))
 }
 
-func (c *OrderController) GetAllOrders(ctx *gin.Context) {
+func (c *RefundPaymentController) GetAllRefundPayments(ctx *gin.Context) {
 	var requestFilterBody common.RequestFilterBodyType
 	if err := ctx.ShouldBindJSON(&requestFilterBody); err != nil {
 		ctx.JSON(http.StatusBadRequest, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
 
-	orders, err := c.orderService.GetAllOrders(requestFilterBody)
+	refundPayments, err := c.refundPaymentService.GetAllRefundPayments(requestFilterBody)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_FETCHED_SUCCESSFULLY, orders))
+	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_FETCHED_SUCCESSFULLY, refundPayments))
 
 }
 
-func (c *OrderController) GetOrderByID(ctx *gin.Context) {
+func (c *RefundPaymentController) GetRefundPaymentByID(ctx *gin.Context) {
 	idParam := ctx.Param("id")
 
-	order, err := c.orderService.GetOrderByID(idParam)
+	refundPayment, err := c.refundPaymentService.GetRefundPaymentByID(idParam)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_FETCHED_SUCCESSFULLY, order))
+	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_FETCHED_SUCCESSFULLY, refundPayment))
 }
 
-func (c *OrderController) UpdateOrder(ctx *gin.Context) {
-	var order models.Order
-	if err := ctx.ShouldBindJSON(&order); err != nil {
+func (c *RefundPaymentController) UpdateRefundPayment(ctx *gin.Context) {
+	var refundPayment models.RefundPayment
+	if err := ctx.ShouldBindJSON(&refundPayment); err != nil {
 		ctx.JSON(http.StatusBadRequest, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
 
-	order.DocId = ctx.Param("id")
+	refundPayment.DocId = ctx.Param("id")
 
-	if err := c.orderService.UpdateOrder(order); err != nil {
+	if err := c.refundPaymentService.UpdateRefundPayment(refundPayment); err != nil {
 		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
 	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_UPDATED_SUCCESSFULLY, nil))
 }
 
-func (c *OrderController) DeleteOrder(ctx *gin.Context) {
+func (c *RefundPaymentController) DeleteRefundPayment(ctx *gin.Context) {
 	idParam := ctx.Param("id")
 
-	if err := c.orderService.DeleteOrder(idParam); err != nil {
+	if err := c.refundPaymentService.DeleteRefundPayment(idParam); err != nil {
 		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
 	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_DELETED_SUCCESSFULLY, nil))
 }
 
-func (c *OrderController) ConfirmOrder(ctx *gin.Context) {
-	var orderConfirmBody common.OrderConfirmBody
+func (c *RefundPaymentController) ConfirmRefundPayment(ctx *gin.Context) {
+	var refundPaymentConfirmBody common.RefundPaymentConfirmBody
 
-	if err := ctx.ShouldBindJSON(&orderConfirmBody); err != nil {
+	if err := ctx.ShouldBindJSON(&refundPaymentConfirmBody); err != nil {
 		ctx.JSON(http.StatusBadRequest, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
 
-	if err := c.orderService.ConfirmOrder(orderConfirmBody); err != nil {
+	if err := c.refundPaymentService.ConfirmRefundPayment(refundPaymentConfirmBody); err != nil {
 		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}

@@ -5,12 +5,16 @@ order-management-system/
 │   └── config.go
 ├── controllers/
 │   └── user_controller.go
+│   └── order_controller.go
 ├── models/
 │   └── user.go
+│   └── order.go
 ├── repositories/
 │   └── user_repository.go
+│   └── order_repository.go
 ├── services/
 │   └── user_service.go
+│   └── order_service.go
 ├── routes/
 │   └── routes.go
 ├── utils/

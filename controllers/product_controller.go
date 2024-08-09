@@ -4,9 +4,10 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/nanda03dev/go2ms/models"
-	"github.com/nanda03dev/go2ms/services"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"github.com/nanda03dev/gcart/common"
+	"github.com/nanda03dev/gcart/global_constant"
+	"github.com/nanda03dev/gcart/models"
+	"github.com/nanda03dev/gcart/services"
 )
 
 type ProductController struct {
@@ -20,24 +21,32 @@ func NewProductController(productService services.ProductService) *ProductContro
 func (c *ProductController) CreateProduct(ctx *gin.Context) {
 	var product models.Product
 	if err := ctx.ShouldBindJSON(&product); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	product.ID = primitive.NewObjectID()
-	if err := c.productService.CreateProduct(product); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	product, err := c.productService.CreateProduct(product)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.JSON(http.StatusCreated, product)
+
+	ctx.JSON(http.StatusCreated, ToSuccessResponse(global_constant.ENTITY_CREATED_SUCCESSFULLY, product.DocId))
 }
 
 func (c *ProductController) GetAllProducts(ctx *gin.Context) {
-	products, err := c.productService.GetAllProducts()
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	var requestFilterBody common.RequestFilterBodyType
+	if err := ctx.ShouldBindJSON(&requestFilterBody); err != nil {
+		ctx.JSON(http.StatusBadRequest, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.JSON(http.StatusOK, products)
+
+	products, err := c.productService.GetAllProducts(requestFilterBody)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
+		return
+	}
+	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_FETCHED_SUCCESSFULLY, products))
 }
 
 func (c *ProductController) GetProductByID(ctx *gin.Context) {
@@ -45,33 +54,34 @@ func (c *ProductController) GetProductByID(ctx *gin.Context) {
 
 	product, err := c.productService.GetProductByID(idParam)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.JSON(http.StatusOK, product)
+	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_FETCHED_SUCCESSFULLY, product))
 }
 
 func (c *ProductController) UpdateProduct(ctx *gin.Context) {
 	var product models.Product
 	if err := ctx.ShouldBindJSON(&product); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	idParam := ctx.Param("id")
-	product.ID, _ = primitive.ObjectIDFromHex(idParam)
+
+	product.DocId = ctx.Param("id")
+
 	if err := c.productService.UpdateProduct(product); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.JSON(http.StatusOK, product)
+	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_UPDATED_SUCCESSFULLY, nil))
 }
 
 func (c *ProductController) DeleteProduct(ctx *gin.Context) {
 	idParam := ctx.Param("id")
 
 	if err := c.productService.DeleteProduct(idParam); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, ToErrorResponse(global_constant.ERROR_WHILE_PROCESSING, err.Error()))
 		return
 	}
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, ToSuccessResponse(global_constant.ENTITY_DELETED_SUCCESSFULLY, nil))
 }

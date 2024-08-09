@@ -11,6 +11,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/nanda03dev/gcart/models"
 	"github.com/nanda03dev/gnosql_client"
+	"github.com/nanda03dev/gque_client"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -18,6 +19,7 @@ import (
 
 var DB *mongo.Database
 var GnoSQLDB *gnosql_client.Database
+var GqueClient *gque_client.Client
 
 func LoadConfig() {
 	err := godotenv.Load()
@@ -34,19 +36,24 @@ func LoadConfig() {
 
 }
 
-func SetupDatabase() *mongo.Database {
-	DatabaseName := "gcart"
+const (
+	MONGO_URI     = "mongodb://localhost:27017"
+	GSQL_URI      = "localhost:5455"
+	GQUE_URI      = "localhost:5456"
+	DATABASE_NAME = "gcart"
+)
 
-	mongoURI := "mongodb://localhost:27017"
+func SetupDatabase() {
 
 	collections := models.GetAllGnosqlCollections()
 
-	GnoSQLDB = gnosql_client.Connect("localhost:5455", DatabaseName, true)
+	GqueClient = gque_client.Connect(GQUE_URI, DATABASE_NAME)
+	GnoSQLDB = gnosql_client.Connect(GSQL_URI, DATABASE_NAME, true)
 
 	GnoSQLDB.CreateCollections(collections)
 
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-	opts := options.Client().ApplyURI(mongoURI).SetConnectTimeout(1 * time.Second).SetServerAPIOptions(serverAPI)
+	opts := options.Client().ApplyURI(MONGO_URI).SetConnectTimeout(1 * time.Second).SetServerAPIOptions(serverAPI)
 
 	ctx, cancel := context.WithTimeout(context.TODO(), 1*time.Second)
 	defer cancel()
@@ -67,5 +74,4 @@ func SetupDatabase() *mongo.Database {
 	fmt.Println("Pinged your deployment. You successfully connected to MongoDB!")
 
 	DB = client.Database("gcart")
-	return DB
 }

@@ -1,14 +1,12 @@
-package workers
+package consumers
 
 import (
 	"fmt"
 	"time"
 )
 
-func InitializeWorker() {
-	go startWorkerWithRecovery(StartCRUDWorker)
-	go startWorkerWithRecovery(StartEntityTimeoutWorker)
-	go startWorkerWithRecovery(StartPaymentRefundWorker)
+func InitializeConsumer() {
+	go startWorkerWithRecovery(StartAllCrudGqueConsumer)
 }
 
 func startWorkerWithRecovery(workerFunc func()) {

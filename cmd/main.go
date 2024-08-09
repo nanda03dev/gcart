@@ -6,6 +6,8 @@ import (
 
 	"github.com/nanda03dev/gcart/common"
 	"github.com/nanda03dev/gcart/config"
+	"github.com/nanda03dev/gcart/consumers"
+	"github.com/nanda03dev/gcart/message"
 	"github.com/nanda03dev/gcart/repositories"
 	"github.com/nanda03dev/gcart/routes"
 	"github.com/nanda03dev/gcart/services"
@@ -17,18 +19,22 @@ func main() {
 
 	common.InitializeChannels()
 
-	database := config.SetupDatabase()
+	config.SetupDatabase()
 
-	repositories.InitializeRepositories(database)
+	repositories.InitializeRepositories()
 
-	services.InitializeServices(database)
+	services.InitializeServices()
 
-	go workers.InitiateWorker()
+	message.InitializeGque()
 
-	InitiateServer()
+	go workers.InitializeWorker()
+
+	go consumers.InitializeConsumer()
+
+	InitializeServer()
 }
 
-func InitiateServer() {
+func InitializeServer() {
 	PORT := os.Getenv("PORT")
 	log.Println("Server running at http://localhost:" + PORT)
 	router := routes.InitializeRouter()

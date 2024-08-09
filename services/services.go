@@ -3,7 +3,6 @@ package services
 import (
 	"github.com/nanda03dev/gcart/config"
 	"github.com/nanda03dev/gcart/repositories"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type Services struct {
@@ -19,7 +18,7 @@ type Services struct {
 
 var AppServices Services
 
-func InitializeServices(db *mongo.Database) {
+func InitializeServices() {
 	AppServices = Services{
 		City:          NewCityService(repositories.NewCityRepository(config.DB)),
 		User:          NewUserService(repositories.NewUserRepository(config.DB)),

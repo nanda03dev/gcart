@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"github.com/nanda03dev/gcart/config"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type Repositories struct {
@@ -18,7 +17,7 @@ type Repositories struct {
 
 var AppRepositories Repositories
 
-func InitializeRepositories(db *mongo.Database) {
+func InitializeRepositories() {
 	AppRepositories = Repositories{
 		City:          NewCityRepository(config.DB),
 		User:          NewUserRepository(config.DB),

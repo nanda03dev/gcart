@@ -7,10 +7,12 @@ import (
 	"github.com/nanda03dev/gcart/common"
 	"github.com/nanda03dev/gcart/config"
 	"github.com/nanda03dev/gcart/global_constant"
+	"github.com/nanda03dev/gcart/message"
 	"github.com/nanda03dev/gcart/models"
 	"github.com/nanda03dev/gcart/repositories"
 	"github.com/nanda03dev/gcart/services"
 	"github.com/nanda03dev/gnosql_client"
+	"github.com/nanda03dev/gque_client"
 )
 
 func StartCRUDWorker() {
@@ -94,5 +96,10 @@ func StartCRUDWorker() {
 		if models.IsRequireToStoreEvent(event.EntityType) {
 			repositories.AppRepositories.Event.Create(context.TODO(), event)
 		}
+
+		queueMessage := gque_client.MessageType{
+			"data": crudEvent,
+		}
+		message.PushMessageToGque(message.CrudEventGque, queueMessage)
 	}
 }

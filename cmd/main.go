@@ -34,9 +34,14 @@ func main() {
 	InitializeServer()
 }
 
+var GCART_PORT = "5457"
+
 func InitializeServer() {
-	PORT := os.Getenv("PORT")
-	log.Println("Server running at http://localhost:" + PORT)
+
+	if value := os.Getenv("GCART_PORT"); value != "" {
+		GCART_PORT = value
+	}
+	log.Println("Server running at http://localhost:" + GCART_PORT)
 	router := routes.InitializeRouter()
-	router.Run(":" + PORT)
+	router.Run(":" + GCART_PORT)
 }

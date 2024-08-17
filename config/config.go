@@ -36,22 +36,38 @@ func LoadConfig() {
 
 }
 
-const (
+var (
 	MONGO_URI     = "mongodb://localhost:27017"
-	GSQL_URI      = "localhost:5455"
-	GQUE_URI      = "localhost:5456"
+	GNOSQL_SERVER = "localhost:5455"
+	GQUE_SERVER   = "localhost:5456"
 	DATABASE_NAME = "gcart"
 )
 
 func SetupDatabase() {
+	if value := os.Getenv("MONGO_URI"); value != "" {
+		MONGO_URI = value
+	}
 
-	collections := models.GetAllGnosqlCollections()
+	if value := os.Getenv("GNOSQL_SERVER"); value != "" {
+		GNOSQL_SERVER = value
+	}
 
-	GqueClient = gque_client.Connect(GQUE_URI, DATABASE_NAME)
-	GnoSQLDB = gnosql_client.Connect(GSQL_URI, DATABASE_NAME, true)
+	if value := os.Getenv("GQUE_SERVER"); value != "" {
+		GQUE_SERVER = value
+	}
 
-	GnoSQLDB.CreateCollections(collections)
+	if value := os.Getenv("DATABASE_NAME"); value != "" {
+		DATABASE_NAME = value
+	}
 
+	// GQUE client connection
+	GqueClient = gque_client.Connect(GQUE_SERVER, DATABASE_NAME)
+
+	// GnoSQL DB client connection
+	GnoSQLDB = gnosql_client.Connect(GNOSQL_SERVER, DATABASE_NAME, true)
+	GnoSQLDB.CreateCollections(models.GetAllGnosqlCollections())
+
+	// MONGO DB client connection
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(MONGO_URI).SetConnectTimeout(1 * time.Second).SetServerAPIOptions(serverAPI)
 
@@ -73,5 +89,5 @@ func SetupDatabase() {
 
 	fmt.Println("Pinged your deployment. You successfully connected to MongoDB!")
 
-	DB = client.Database("gcart")
+	DB = client.Database(DATABASE_NAME)
 }

@@ -1,0 +1,64 @@
+version: "3.9"
+name: gcart-app-local
+services:
+    mongo:
+        image: mongo:latest
+        container_name: mongo_container
+        ports:
+            - "27017:27017"
+        volumes:
+            - mongo-data:/data/db
+        networks:
+            - gcart-network
+    gnosql:
+        container_name: gnosql_container
+        image: nanda03dev/gnosql:latest
+        ports:
+            - 5454:5454
+            - 5455:5455
+        volumes:
+            - gnosqldb-data:/root/gnosql/db/
+        environment:
+            GIN_PORT: 5454
+            GRPC_PORT: 5455
+        networks:
+            - gcart-network
+    gque:
+        container_name: gque_container
+        image: nanda03dev/gque:latest
+        ports:
+            - 5456:5456
+        environment:
+            GQUE_PORT: 5456
+            GNOSQL_SERVER: gnosql:5455
+        depends_on:
+            - gnosql
+        networks:
+            - gcart-network
+    gcart:
+        container_name: gcart_container
+        build:
+            context: .
+            dockerfile: Dockerfile.local
+        ports:
+            - 5457:5457
+        environment:
+            GCART_PORT: 5457
+            MONGO_URI: "mongodb://mongo:27017"
+            GQUE_SERVER: gque:5456
+            GNOSQL_SERVER: gnosql:5455
+            DATABASE_NAME: gcart
+        depends_on:
+            - mongo
+            - gnosql
+            - gque
+        networks:
+            - gcart-network
+volumes:
+    mongo-data:
+    gnosqldb-data:
+        name: gnosqldb-data
+
+networks:
+    gcart-network:
+        driver: bridge

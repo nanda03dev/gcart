@@ -4,14 +4,14 @@ import (
 	"log"
 	"os"
 
-	"github.com/nanda03dev/gcart/common"
-	"github.com/nanda03dev/gcart/config"
-	"github.com/nanda03dev/gcart/consumers"
-	"github.com/nanda03dev/gcart/message"
-	"github.com/nanda03dev/gcart/repositories"
-	"github.com/nanda03dev/gcart/routes"
-	"github.com/nanda03dev/gcart/services"
-	"github.com/nanda03dev/gcart/workers"
+	"github.com/nanda03dev/gcart/src/common"
+	"github.com/nanda03dev/gcart/src/config"
+	"github.com/nanda03dev/gcart/src/consumers"
+	"github.com/nanda03dev/gcart/src/message"
+	"github.com/nanda03dev/gcart/src/repositories"
+	"github.com/nanda03dev/gcart/src/routes"
+	"github.com/nanda03dev/gcart/src/services"
+	"github.com/nanda03dev/gcart/src/workers"
 )
 
 func main() {

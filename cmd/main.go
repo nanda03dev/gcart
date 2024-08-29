@@ -7,7 +7,7 @@ import (
 	"github.com/nanda03dev/gcart/src/common"
 	"github.com/nanda03dev/gcart/src/config"
 	"github.com/nanda03dev/gcart/src/consumers"
-	"github.com/nanda03dev/gcart/src/message"
+	"github.com/nanda03dev/gcart/src/message_queue"
 	"github.com/nanda03dev/gcart/src/repositories"
 	"github.com/nanda03dev/gcart/src/routes"
 	"github.com/nanda03dev/gcart/src/services"
@@ -25,7 +25,7 @@ func main() {
 
 	services.InitializeServices()
 
-	message.InitializeGque()
+	message_queue.InitializeGque()
 
 	go workers.InitializeWorker()
 

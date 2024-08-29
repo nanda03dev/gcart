@@ -7,7 +7,7 @@ import (
 	"github.com/nanda03dev/gcart/src/common"
 	"github.com/nanda03dev/gcart/src/config"
 	"github.com/nanda03dev/gcart/src/global_constant"
-	"github.com/nanda03dev/gcart/src/message"
+	"github.com/nanda03dev/gcart/src/message_queue"
 	"github.com/nanda03dev/gcart/src/models"
 	"github.com/nanda03dev/gcart/src/repositories"
 	"github.com/nanda03dev/gcart/src/services"
@@ -100,6 +100,6 @@ func StartCRUDWorker() {
 		queueMessage := gque_client.MessageType{
 			"data": crudEvent,
 		}
-		message.PushMessageToGque(message.CrudEventGque, queueMessage)
+		message_queue.PushMessageToGque(message_queue.CrudEventGque, queueMessage)
 	}
 }

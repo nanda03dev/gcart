@@ -1,4 +1,4 @@
-package message
+package message_queue
 
 import (
 	"fmt"
